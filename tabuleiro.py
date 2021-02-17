@@ -2,6 +2,7 @@ import pygame
 from pygame.sprite import Group, AbstractGroup
 
 from casa import Casa
+from pecas_models.pecaBase import PecaBase
 
 
 class Tabuleiro(pygame.sprite.Sprite):
@@ -47,28 +48,33 @@ class Tabuleiro(pygame.sprite.Sprite):
         return [i, j]
 
     def selecionar_casa(self, posicao_mouse: tuple[int, int]):
-        self.limpar_selecoes()
         posicao_casa = self.calcular_casa(posicao_mouse)
+        i: int = posicao_casa[0]
+        j: int = posicao_casa[1]
+        print('i', i, 'j', j, 'Clicou em', self.vetor_de_Controle[i][j].posicao, self.vetor_de_Controle[i][j].posicao_na_matriz)
 
-        self.casa_selecionada = self.vetor_de_Controle[posicao_casa[0]][posicao_casa[1]]
-        self.casa_selecionada.marcar_como_selecionado()
-        self.marcar_casas_possiveis()
+        if self.vetor_de_Controle[i][j].possivel:
+            print("Movendo peça para casa", self.vetor_de_Controle[i][j].posicao, self.vetor_de_Controle[i][j].posicao_na_matriz)
+            self.mover_peca(self.vetor_de_Controle[i][j])
+            self.limpar_selecoes()
+
+        elif self.vetor_de_Controle[i][j].peca:
+            self.limpar_selecoes()
+            if self.vetor_de_Controle[i][j].peca.tonalidade == 'claro':
+                self.casa_selecionada = self.vetor_de_Controle[i][j]
+                self.casa_selecionada.marcar_como_selecionado()
+                print('Casa selecionada', self.casa_selecionada.posicao, self.casa_selecionada.selecionado)
+                self.marcar_casas_possiveis()
+
+        else:
+            self.limpar_selecoes()
 
     def marcar_casas_possiveis(self):
         posicao_casa_selecionada = self.casa_selecionada.posicao_na_matriz
+        i: int = posicao_casa_selecionada[0]
+        j: int = posicao_casa_selecionada[1]
 
-        #TODO: Deletar esse trecho abaixo, lógica deverá ser feita por peça
-        i = posicao_casa_selecionada[0]
-        j = posicao_casa_selecionada[1]
-
-        if i + 1 < 8:
-            self.casas_possiveis.append(self.vetor_de_Controle[i + 1][j])
-        if i - 1 >= 0:
-            self.casas_possiveis.append(self.vetor_de_Controle[i - 1][j])
-        if j + 1 < 8:
-            self.casas_possiveis.append(self.vetor_de_Controle[i][j + 1])
-        if j - 1 >= 0:
-            self.casas_possiveis.append(self.vetor_de_Controle[i][j - 1])
+        self.casas_possiveis = self.vetor_de_Controle[i][j].peca.get_casas_possiveis(self.vetor_de_Controle)
 
         for i in range(0, len(self.casas_possiveis), 1):
             self.casas_possiveis[i].marcar_como_possivel()
@@ -83,3 +89,9 @@ class Tabuleiro(pygame.sprite.Sprite):
             self.casas_possiveis[i].desmarcar_como_possivel()
 
         self.casas_possiveis.clear()
+
+    def mover_peca(self, casa_destino: Casa):
+        peca_movida: PecaBase = self.casa_selecionada.peca
+        peca_movida.movimentos += 1
+        self.casa_selecionada.remover_peca()
+        casa_destino.inserir_peca(peca_movida)

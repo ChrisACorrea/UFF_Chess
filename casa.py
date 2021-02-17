@@ -1,6 +1,10 @@
-import pygame
+from __future__ import annotations
 
+import pygame
 from appConstants import ImagesPath
+from pecas_models.peao import Peao
+from pecas_models.pecaBase import PecaBase
+
 
 class Casa(pygame.sprite.Sprite):
     letrasColunas: list[str] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
@@ -18,6 +22,7 @@ class Casa(pygame.sprite.Sprite):
         self.possivel: bool = False
         self.caminhoImagemFundo: str = ''
         self.posicao_na_matriz: tuple(int, int) = posicao_na_matriz
+        self.peca: PecaBase = None
 
         self.tamanho: int = int(display.get_height() / 10)
         x = (posicao_na_matriz[1] * self.tamanho) + ((display.get_width() - (self.tamanho * 8)) / 2)
@@ -33,6 +38,7 @@ class Casa(pygame.sprite.Sprite):
         self.tonalidade: str = primeiro_tom if (posicao_na_matriz[1] % 2 == 0) else segundo_tom
 
         self.atualizar_imagem_de_fundo()
+        self.carregar_peca()
 
     def atualizar_imagem_de_fundo(self):
         if self.tonalidade == 'escuro':
@@ -68,3 +74,28 @@ class Casa(pygame.sprite.Sprite):
     def desmarcar_como_possivel(self):
         self.possivel = False
         self.atualizar_imagem_de_fundo()
+
+    def inserir_peca(self, peca: PecaBase):
+        self.peca = peca
+        self.peca.rect.center = self.rect.center
+        self.peca.posicao[0] = self.posicao_na_matriz[0]
+        self.peca.posicao[1] = self.posicao_na_matriz[1]
+
+    def remover_peca(self):
+        self.peca = None
+
+    def carregar_peca(self):
+        i: int = self.posicao_na_matriz[0]
+        j: int = self.posicao_na_matriz[1]
+
+        if 2 <= i <= 5:
+            return
+
+        # Peões pretos
+        if i == 1:
+            self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j])
+            return
+        # Peões brancos
+        if i == 6:
+            self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j])
+            return
