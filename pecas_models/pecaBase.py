@@ -7,9 +7,12 @@ from pygame.sprite import AbstractGroup
 
 class PecaBase(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
 
-    def __init__(self, *groups: AbstractGroup, rect_base: pygame.Rect, tom: str, posicao: tuple[int, int]):
+    def __init__(self, *groups: AbstractGroup, rect_base: pygame.Rect, tom: str, posicao: tuple[int, int], casaOrigem: str):
         super().__init__(*groups)
 
+        self._layer = 2
+
+        self.__id: str = self.__class__.__name__ + ' ' + tom + ' ' + casaOrigem
         self.__caminho_imagem: str = ''
         self.__tonalidade: str = tom
         self.__posicao: tuple[int, int] = posicao
@@ -18,6 +21,13 @@ class PecaBase(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
         self.rect = pygame.rect.Rect(rect_base.x, rect_base.y, rect_base.width / 1.6, rect_base.height / 1.3)
         self.rect.center = rect_base.center
 
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id(self, id):
+        self.__id = id
 
     @property
     def tonalidade(self):

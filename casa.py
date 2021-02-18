@@ -18,10 +18,12 @@ class Casa(pygame.sprite.Sprite):
     ):
         super().__init__(*groups)
 
+        self._layer = 1
+
         self.selecionado: bool = False
         self.possivel: bool = False
         self.caminhoImagemFundo: str = ''
-        self.posicao_na_matriz: tuple(int, int) = posicao_na_matriz
+        self.posicao_na_matriz: tuple[int, int] = posicao_na_matriz
         self.peca: PecaBase = None
 
         self.tamanho: int = int(display.get_height() / 10)
@@ -38,7 +40,6 @@ class Casa(pygame.sprite.Sprite):
         self.tonalidade: str = primeiro_tom if (posicao_na_matriz[1] % 2 == 0) else segundo_tom
 
         self.atualizar_imagem_de_fundo()
-        self.carregar_peca()
 
     def atualizar_imagem_de_fundo(self):
         if self.tonalidade == 'escuro':
@@ -76,8 +77,11 @@ class Casa(pygame.sprite.Sprite):
         self.atualizar_imagem_de_fundo()
 
     def inserir_peca(self, peca: PecaBase):
+        if self.peca is not None:
+            self.peca.kill()
+
         self.peca = peca
-        self.peca.rect.center = self.rect.center
+        self.peca.rect.center = self.rect.copy().center
         self.peca.posicao[0] = self.posicao_na_matriz[0]
         self.peca.posicao[1] = self.posicao_na_matriz[1]
 
@@ -93,9 +97,9 @@ class Casa(pygame.sprite.Sprite):
 
         # Peões pretos
         if i == 1:
-            self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j])
+            self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
             return
         # Peões brancos
         if i == 6:
-            self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j])
+            self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
             return

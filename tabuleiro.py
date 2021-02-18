@@ -15,6 +15,7 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.vetor_de_Controle: list[list[Casa]] = []
         self.casa_selecionada: Casa = None
         self.casas_possiveis: list[Casa] = []
+        self.vez = 'claro'
 
         self.display = display
         self.altura_tela = display.get_height()
@@ -29,6 +30,12 @@ class Tabuleiro(pygame.sprite.Sprite):
                 self.vetor_de_Controle[i].append(Casa(self.objectGroup,
                                                       display=self.display,
                                                       posicao_na_matriz=(i, j)))
+        self.iniciar_pecas()
+
+    def iniciar_pecas(self):
+        for i in range(0, 8, 1):
+            for j in range(0, 8, 1):
+                self.vetor_de_Controle[i][j].carregar_peca()
 
     def desenhar_tabuleiro(self) -> None:
         self.objectGroup.draw(self.display)
@@ -51,7 +58,7 @@ class Tabuleiro(pygame.sprite.Sprite):
         posicao_casa = self.calcular_casa(posicao_mouse)
         i: int = posicao_casa[0]
         j: int = posicao_casa[1]
-        print('i', i, 'j', j, 'Clicou em', self.vetor_de_Controle[i][j].posicao, self.vetor_de_Controle[i][j].posicao_na_matriz)
+        print('Clicou em', self.vetor_de_Controle[i][j].posicao, self.vetor_de_Controle[i][j].posicao_na_matriz)
 
         if self.vetor_de_Controle[i][j].possivel:
             print("Movendo peça para casa", self.vetor_de_Controle[i][j].posicao, self.vetor_de_Controle[i][j].posicao_na_matriz)
@@ -59,8 +66,9 @@ class Tabuleiro(pygame.sprite.Sprite):
             self.limpar_selecoes()
 
         elif self.vetor_de_Controle[i][j].peca:
+            print("Peça nessa casa: ", self.vetor_de_Controle[i][j].peca.id)
             self.limpar_selecoes()
-            if self.vetor_de_Controle[i][j].peca.tonalidade == 'claro':
+            if self.vetor_de_Controle[i][j].peca.tonalidade == self.vez:
                 self.casa_selecionada = self.vetor_de_Controle[i][j]
                 self.casa_selecionada.marcar_como_selecionado()
                 print('Casa selecionada', self.casa_selecionada.posicao, self.casa_selecionada.selecionado)
@@ -95,3 +103,10 @@ class Tabuleiro(pygame.sprite.Sprite):
         peca_movida.movimentos += 1
         self.casa_selecionada.remover_peca()
         casa_destino.inserir_peca(peca_movida)
+        self.trocar_vez()
+
+    def trocar_vez(self):
+        if self.vez == 'claro':
+            self.vez = 'escuro'
+        elif self.vez == 'escuro':
+            self.vez = 'claro'
