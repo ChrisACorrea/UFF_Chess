@@ -3,6 +3,11 @@ from __future__ import annotations
 import pygame
 from appConstants import ImagesPath
 from pecas_models.peao import Peao
+from pecas_models.cavalo import Cavalo
+from pecas_models.torre import Torre
+from pecas_models.bispo import Bispo
+from pecas_models.rainha import Rainha
+from pecas_models.rei import Rei
 from pecas_models.pecaBase import PecaBase
 
 
@@ -102,4 +107,44 @@ class Casa(pygame.sprite.Sprite):
         # Peões brancos
         if i == 6:
             self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Cavalo preto
+        if (i == 0 and j == 2) or (i == 0 and j == 6):
+            self.peca = Cavalo(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Cavalo claro
+        if (i == 7 and j == 2) or (i == 7 and j == 6):
+            self.peca = Cavalo(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Torre preto
+        if (i == 0 and j == 0) or (i == 0 and j == 7):
+            self.peca = Torre(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Torre claro
+        if (i == 7 and j == 0) or (i == 7 and j == 7):
+            self.peca = Torre(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Bispo preto
+        if (i == 0 and j == 1) or (i == 0 and j == 5):
+            self.peca = Bispo(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Bispo claro
+        if (i == 7 and j == 1) or (i == 7 and j == 5):
+            self.peca = Bispo(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Rainha preto
+        if (i == 0 and j == 3):
+            self.peca = Rainha(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Rainha claro
+        if (i == 7 and j == 3):
+            self.peca = Rainha(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Rei preto
+        if (i == 0 and j == 4):
+            self.peca = Rei(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
+            return
+        # Rei claro
+        if (i == 7 and j == 4):
+            self.peca = Rei(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
             return
