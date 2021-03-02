@@ -28,7 +28,54 @@ class Torre(PecaBase):
         casas_possiveis: list[Casa] = []
         i: int = self.posicao[0]
         j: int = self.posicao[1]
+        
+        
+        casa_i = i
+        casa_i_vazia = True # proxima casa da variável i está vazia
+        while (casa_i + 1 < 8) and casa_i_vazia:  #fica em loop enquanto a próxima casa está vazia ou encontrar uma peça do outro time
+            if (tabuleiro[casa_i + 1][j].peca is None): 
+                casas_possiveis.append(tabuleiro[casa_i + 1][j])  
+            elif(self.tonalidade != tabuleiro[casa_i + 1][j].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[casa_i + 1][j]) 
+                casa_i_vazia = False # Próxima casa da variável i está com uma peça de cor diferente. Guarda a casa e sai do loop
+            else:
+                casa_i_vazia = False # Próxima casa da variável i está com uma peça da mesma cor. Sai do loop
+            casa_i += 1
 
-        #CÓDIGO
+        casa_i = i    
+        casa_i_vazia = True
+        while (casa_i - 1 >= 0) and casa_i_vazia:
+            if (tabuleiro[casa_i - 1][j].peca is None): 
+                casas_possiveis.append(tabuleiro[casa_i - 1][j])  
+            elif(self.tonalidade != tabuleiro[casa_i - 1][j].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[casa_i - 1][j])
+                casa_i_vazia = False
+            else:
+                casa_i_vazia = False
+            casa_i -= 1
+        
+        casa_j = j
+        casa_j_vazia = True
+        while (casa_j + 1 < 8) and casa_j_vazia:
+            if (tabuleiro[i][casa_j + 1].peca is None): 
+                casas_possiveis.append(tabuleiro[i][casa_j + 1])  
+            elif(self.tonalidade != tabuleiro[i][casa_j + 1].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i][casa_j + 1])
+                casa_j_vazia = False
+            else:
+                casa_j_vazia = False
+            casa_j += 1
+        
+        casa_j = j
+        casa_j_vazia = True    
+        while (casa_j - 1 >= 0) and casa_j_vazia:
+            if (tabuleiro[i][casa_j - 1].peca is None): 
+                casas_possiveis.append(tabuleiro[i][casa_j - 1])
+            elif(self.tonalidade != tabuleiro[i][casa_j - 1].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i][casa_j - 1]) 
+                casa_j_vazia = False
+            else:
+                casa_j_vazia = False
+            casa_j -= 1 
 
         return casas_possiveis
