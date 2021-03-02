@@ -99,7 +99,7 @@ class Casa(pygame.sprite.Sprite):
 
         if 2 <= i <= 5:
             return
-
+        
         # Peões pretos
         if i == 1:
             self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
@@ -109,13 +109,14 @@ class Casa(pygame.sprite.Sprite):
             self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
             return
         # Cavalo preto
-        if (i == 0 and j == 2) or (i == 0 and j == 6):
+        if (i == 0 and j == 1) or (i == 0 and j == 6):
             self.peca = Cavalo(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
             return
         # Cavalo claro
-        if (i == 7 and j == 2) or (i == 7 and j == 6):
+        if (i == 7 and j == 1) or (i == 7 and j == 6):
             self.peca = Cavalo(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
             return
+        
         # Torre preto
         if (i == 0 and j == 0) or (i == 0 and j == 7):
             self.peca = Torre(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
@@ -124,12 +125,13 @@ class Casa(pygame.sprite.Sprite):
         if (i == 7 and j == 0) or (i == 7 and j == 7):
             self.peca = Torre(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
             return
+        
         # Bispo preto
-        if (i == 0 and j == 1) or (i == 0 and j == 5):
+        if (i == 0 and j == 2) or (i == 0 and j == 5):
             self.peca = Bispo(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)
             return
         # Bispo claro
-        if (i == 7 and j == 1) or (i == 7 and j == 5):
+        if (i == 7 and j == 2) or (i == 7 and j == 5):
             self.peca = Bispo(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
             return
         # Rainha preto
@@ -148,3 +150,4 @@ class Casa(pygame.sprite.Sprite):
         if (i == 7 and j == 4):
             self.peca = Rei(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
             return
+    
