@@ -29,6 +29,53 @@ class Cavalo(PecaBase):
         i: int = self.posicao[0]
         j: int = self.posicao[1]
 
-        #CÓDIGO
+        if (i - 2 >= 0) and (j - 1 >= 0):
+            if tabuleiro[i - 2][j - 1].peca is None:
+                casas_possiveis.append(tabuleiro[i - 2][j - 1])
+            elif (self.tonalidade != tabuleiro[i - 2][j - 1].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i - 2][j - 1])
         
+        if (i - 2 >= 0) and (j + 1 < 8):
+            if tabuleiro[i - 2][j + 1].peca is None:
+                casas_possiveis.append(tabuleiro[i - 2][j + 1])
+            elif (self.tonalidade != tabuleiro[i - 2][j + 1].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i - 2][j + 1])
+        
+        if (i - 1 >= 0) and (j - 2 >= 0):
+            if tabuleiro[i - 1][j - 2].peca is None:
+                casas_possiveis.append(tabuleiro[i - 1][j - 2])
+            elif (self.tonalidade != tabuleiro[i - 1][j - 2].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i - 1][j - 2])
+
+        if (i - 1 >= 0) and (j + 2 < 8):
+            if tabuleiro[i - 1][j + 2].peca is None:
+                casas_possiveis.append(tabuleiro[i - 1][j + 2])
+            elif (self.tonalidade != tabuleiro[i - 1][j + 2].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i - 1][j + 2])
+
+        if (i + 1 < 8) and (j - 2 >= 0):
+            if tabuleiro[i + 1][j - 2].peca is None:
+                casas_possiveis.append(tabuleiro[i + 1][j - 2])
+            elif (self.tonalidade != tabuleiro[i + 1][j - 2].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i + 1][j - 2])
+
+        if (i + 1 < 8) and (j + 2 < 8):
+            if tabuleiro[i + 1][j + 2].peca is None:
+                casas_possiveis.append(tabuleiro[i + 1][j + 2])
+            elif (self.tonalidade != tabuleiro[i + 1][j + 2].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i + 1][j + 2])
+
+        if (i + 2 < 8) and (j - 1 >= 0):
+            if tabuleiro[i + 2][j - 1].peca is None:
+                casas_possiveis.append(tabuleiro[i + 2][j - 1])
+            elif (self.tonalidade != tabuleiro[i + 2][j - 1].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i + 2][j - 1])
+
+        if (i + 2 < 8) and (j + 1 < 8):
+            if tabuleiro[i + 2][j + 1].peca is None:
+                casas_possiveis.append(tabuleiro[i + 2][j + 1])
+            elif (self.tonalidade != tabuleiro[i + 2][j + 1].peca.tonalidade):
+                casas_possiveis.append(tabuleiro[i + 2][j + 1])
+
+
         return casas_possiveis
