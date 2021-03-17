@@ -24,7 +24,7 @@ class Rainha(PecaBase):
         self.image = pygame.image.load(self.caminho_imagem)
         self.image = pygame.transform.smoothscale(self.image, [self.rect.width, self.rect.height])
 
-    def get_casas_possiveis(self, tabuleiro: list[list[Casa]]) -> list[tuple[int, int]]:
+    def get_casas_possiveis(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas=False) -> list[Casa]:
         casas_possiveis: list[Casa] = []
         i: int = self.posicao[0]
         j: int = self.posicao[1]
@@ -41,6 +41,8 @@ class Rainha(PecaBase):
                 casa_i_j_vazia = False  # Próxima casa da variável i/j está com uma peça de cor diferente. Guarda a casa e sai do loop
             else:
                 casa_i_j_vazia = False  # Próxima casa da variável i/j está com uma peça da mesma cor. Sai do loop
+                if incluir_casas_ameacadas:
+                    casas_possiveis.append(tabuleiro[casa_i + 1][casa_j + 1])
             casa_i += 1
             casa_j += 1
 
@@ -56,6 +58,8 @@ class Rainha(PecaBase):
                 casa_i_j_vazia = False
             else:
                 casa_i_j_vazia = False
+                if incluir_casas_ameacadas:
+                    casas_possiveis.append(tabuleiro[casa_i - 1][casa_j - 1])
             casa_i -= 1
             casa_j -= 1
 
@@ -70,6 +74,9 @@ class Rainha(PecaBase):
                 casa_i_j_vazia = False
             else:
                 casa_i_j_vazia = False
+                if incluir_casas_ameacadas:
+                    casas_possiveis.append(tabuleiro[casa_i + 1][casa_j - 1])
+
             casa_j -= 1
             casa_i += 1
 
@@ -84,6 +91,10 @@ class Rainha(PecaBase):
                 casa_i_j_vazia = False
             else:
                 casa_i_j_vazia = False
+                if incluir_casas_ameacadas:
+                    casas_possiveis.append(tabuleiro[casa_i - 1][casa_j + 1])
+
+
             casa_j += 1
             casa_i -= 1
 
@@ -98,6 +109,9 @@ class Rainha(PecaBase):
                 casa_i_vazia = False  # Próxima casa da variável i está com uma peça de cor diferente. Guarda a casa e sai do loop
             else:
                 casa_i_vazia = False  # Próxima casa da variável i está com uma peça da mesma cor. Sai do loop
+                if incluir_casas_ameacadas:
+                    casas_possiveis.append(tabuleiro[casa_i + 1][j])
+
             casa_i += 1
 
         casa_i = i
@@ -110,6 +124,9 @@ class Rainha(PecaBase):
                 casa_i_vazia = False
             else:
                 casa_i_vazia = False
+                if incluir_casas_ameacadas:
+                    casas_possiveis.append(tabuleiro[casa_i - 1][j])
+
             casa_i -= 1
 
         casa_j = j
@@ -122,6 +139,9 @@ class Rainha(PecaBase):
                 casa_j_vazia = False
             else:
                 casa_j_vazia = False
+                if incluir_casas_ameacadas:
+                    casas_possiveis.append(tabuleiro[i][casa_j + 1])
+
             casa_j += 1
 
         casa_j = j
@@ -134,6 +154,9 @@ class Rainha(PecaBase):
                 casa_j_vazia = False
             else:
                 casa_j_vazia = False
+                if incluir_casas_ameacadas:
+                    casas_possiveis.append(tabuleiro[i][casa_j - 1])
+
             casa_j -= 1
 
         return casas_possiveis

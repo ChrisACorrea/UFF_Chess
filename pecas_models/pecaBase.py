@@ -62,7 +62,7 @@ class PecaBase(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
         self.__movimentos = movimentos
 
     @abc.abstractmethod
-    def get_casas_possiveis(self, tabuleiro: list[list[Casa]]) -> list[tuple[int, int]]:
+    def get_casas_possiveis(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas: bool = False) -> list[Casa]:
         pass
 
     @abc.abstractmethod

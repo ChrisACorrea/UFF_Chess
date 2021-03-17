@@ -24,7 +24,7 @@ class Peao(PecaBase):
         self.image = pygame.image.load(self.caminho_imagem)
         self.image = pygame.transform.smoothscale(self.image, [self.rect.width, self.rect.height])
 
-    def get_casas_possiveis(self, tabuleiro: list[list[Casa]]) -> list[tuple[int, int]]:
+    def get_casas_possiveis(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas=False) -> list[Casa]:
         casas_possiveis: list[Casa] = []
         i: int = self.posicao[0]
         j: int = self.posicao[1]
@@ -60,3 +60,24 @@ class Peao(PecaBase):
                             casas_possiveis.append(tabuleiro[i + 1][j + 1])
 
         return casas_possiveis
+
+    def get_casas_de_captura(self, tabuleiro: list[list[Casa]]) -> list[Casa]:
+        casas_de_captura: list[Casa] = []
+        i: int = self.posicao[0]
+        j: int = self.posicao[1]
+
+        if self.tonalidade == 'claro':
+            if i - 1 >= 0:
+                if j - 1 >= 0:
+                    casas_de_captura.append(tabuleiro[i - 1][j - 1])
+                if j + 1 < 8:
+                    casas_de_captura.append(tabuleiro[i - 1][j + 1])
+
+        elif self.tonalidade == 'escuro':
+            if i + 1 < 8:
+                if j - 1 >= 0:
+                    casas_de_captura.append(tabuleiro[i + 1][j - 1])
+                if j + 1 < 8:
+                    casas_de_captura.append(tabuleiro[i + 1][j + 1])
+
+        return casas_de_captura
