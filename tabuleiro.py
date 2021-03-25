@@ -3,7 +3,8 @@ from pygame.sprite import Group, AbstractGroup
 
 from casa import Casa
 from pecas_models.pecaBase import PecaBase
-
+from pecas_models.peao import Peao
+from pecas_models.rainha import Rainha
 
 class Tabuleiro(pygame.sprite.Sprite):
 
@@ -103,6 +104,7 @@ class Tabuleiro(pygame.sprite.Sprite):
         peca_movida.movimentos += 1
         self.casa_selecionada.remover_peca()
         casa_destino.inserir_peca(peca_movida)
+        self.promocao()
         self.trocar_vez()
 
     def trocar_vez(self):
@@ -110,3 +112,18 @@ class Tabuleiro(pygame.sprite.Sprite):
             self.vez = 'escuro'
         elif self.vez == 'escuro':
             self.vez = 'claro'
+
+
+    def promocao(self):
+        for i in range(0, 8):
+            if type(self.vetor_de_Controle[0][i].peca) == Peao:
+                casa: Casa = self.vetor_de_Controle[0][i]
+                peca: Peao = self.vetor_de_Controle[0][i].peca
+                rainha = Rainha(peca.groups(), rect_base=casa.rect, tom=peca.tonalidade, posicao=peca.posicao,casaOrigem=peca.id)
+                self.vetor_de_Controle[0][i].inserir_peca(rainha)
+            if type(self.vetor_de_Controle[7][i].peca) == Peao:
+                casa: Casa = self.vetor_de_Controle[0][i]
+                peca: Peao = self.vetor_de_Controle[7][i].peca
+                rainha = Rainha(peca.groups(), rect_base=casa.rect, tom=peca.tonalidade, posicao=peca.posicao,casaOrigem=peca.id)
+                self.vetor_de_Controle[7][i].inserir_peca(rainha)
+
