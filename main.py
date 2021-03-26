@@ -1,4 +1,4 @@
-import pygame
+import pygame, pygame_menu
 
 from appConstants import ImagesPath
 from tabuleiro import Tabuleiro
@@ -7,6 +7,23 @@ from tabuleiro import Tabuleiro
 pygame.init()
 # Criando a janela
 display = pygame.display.set_mode([800, 600])
+
+def set_difficulty(value, difficulty):
+    # Do the job here !
+    pass
+
+def start_the_game():
+    menu.disable()
+
+menu = pygame_menu.Menu(300, 400, 'Welcome',
+                       theme=pygame_menu.themes.THEME_BLUE)
+
+menu.add.text_input('Name :', default='John Doe')
+menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
+menu.add.button('Play', start_the_game)
+menu.add.button('Quit', pygame_menu.events.EXIT)
+menu.mainloop(display)
+
 # Trocando o título
 windowIcon = pygame.image.load(ImagesPath.ICONE_PRETO)
 pygame.display.set_caption("UFF Chess")
