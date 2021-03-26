@@ -1,27 +1,30 @@
 import pygame
 from pygame.sprite import Group, AbstractGroup
-
+import time
 from casa import Casa
 from pecas_models.pecaBase import PecaBase
 
 
 class Tabuleiro(pygame.sprite.Sprite):
 
-    def __init__(self, display: pygame.Surface, *groups: AbstractGroup):
+    def __init__(self, display: pygame.Surface, *groups: AbstractGroup, jogador1, jogador2):
         super().__init__(*groups)
-
         self.display: pygame.Surface
         self.objectGroup: Group
         self.vetor_de_Controle: list[list[Casa]] = []
         self.casa_selecionada: Casa = None
         self.casas_possiveis: list[Casa] = []
         self.vez = 'claro'
-
         self.display = display
         self.altura_tela = display.get_height()
         self.objectGroup = pygame.sprite.Group()
 
         self.iniciar_tabuleiro()
+
+        global jogadorOne
+        jogadorOne = jogador1
+        global jogadorTwo
+        jogadorTwo = jogador2
 
     def iniciar_tabuleiro(self):
         for i in range(0, 8, 1):
@@ -41,11 +44,11 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.objectGroup.draw(self.display)
         return
 
+
     def clicou_dentro_do_tabuleiro(self, posicao_mouse: tuple[int, int]) -> bool:
         if ((self.vetor_de_Controle[0][0].rect.left < posicao_mouse[0] < self.vetor_de_Controle[7][7].rect.right) and
                 (self.vetor_de_Controle[0][0].rect.top < posicao_mouse[1] < self.vetor_de_Controle[7][7].rect.bottom)):
             return True
-
         return False
 
     def calcular_casa(self, posicao_mouse: tuple[int, int]):
@@ -108,5 +111,17 @@ class Tabuleiro(pygame.sprite.Sprite):
     def trocar_vez(self):
         if self.vez == 'claro':
             self.vez = 'escuro'
+            self.mostrar_vez(jogadorTwo)
         elif self.vez == 'escuro':
             self.vez = 'claro'
+            self.mostrar_vez(jogadorOne)
+
+    def mostrar_vez(self, jogador):
+        txt = 'Vez do jogador ' + jogador  ##### armazena o texto
+        pygame.font.init()  ##### inicia font
+        fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
+        fontesys = pygame.font.SysFont(fonte, 120)  ##### usa a fonte padrão
+        txttela = fontesys.render(txt, 1, (255, 255, 255))  ##### renderiza o texto na cor desejada
+        self.display.blit(txttela, (270, 320))  ##### coloca na posição 50,900 (tela FHD)
+        pygame.display.update()
+        time.sleep(2)

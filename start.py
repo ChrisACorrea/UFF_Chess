@@ -1,6 +1,8 @@
 import pygame
 from appConstants import ImagesPath
 from tabuleiro import Tabuleiro
+from pygame import font
+import time
 
 class Start():
     def draw(self, display, tabuleiro):
@@ -28,3 +30,4 @@ class Start():
                         else:
                             tabuleiro.limpar_selecoes()
                 self.draw(display, tabuleiro)
+

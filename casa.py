@@ -150,3 +150,4 @@ class Casa(pygame.sprite.Sprite):
         if (i == 7 and j == 4):
             self.peca = Rei(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
             return
+
