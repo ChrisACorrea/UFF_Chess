@@ -30,6 +30,8 @@ class Casa(pygame.sprite.Sprite):
         self.caminhoImagemFundo: str = ''
         self.posicao_na_matriz: tuple[int, int] = posicao_na_matriz
         self.peca: PecaBase = None
+        self.is_roque: bool = False
+        self.is_en_Passant: bool = False
 
         self.tamanho: int = int(display.get_height() / 10)
         x = (posicao_na_matriz[1] * self.tamanho) + ((display.get_width() - (self.tamanho * 8)) / 2)
@@ -150,4 +152,3 @@ class Casa(pygame.sprite.Sprite):
         if (i == 7 and j == 4):
             self.peca = Rei(self.groups(), rect_base=self.rect.copy(), tom='claro', posicao=[i, j], casaOrigem=self.posicao)
             return
-

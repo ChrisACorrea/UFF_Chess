@@ -12,6 +12,8 @@ class Rei(PecaBase):
 
     def __init__(self, *groups: AbstractGroup, rect_base: pygame.Rect, tom: str, posicao: tuple[int, int], casaOrigem: str):
         super().__init__(*groups, rect_base=rect_base, tom=tom, posicao=posicao, casaOrigem=casaOrigem)
+        conta_xaque = 0
+        xeque = False
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.REI_PRETO
         elif self.tonalidade == 'claro':
@@ -151,3 +153,13 @@ class Rei(PecaBase):
             j = 0
 
         return casas_possiveis
+
+    def add_xeque(self):
+        self.conta_xeque += 1
+        self.xeque = True
+
+    def remove_xeque(self):
+        self.xeque = False
+
+    def is_xeque(self):
+        return self.xeque

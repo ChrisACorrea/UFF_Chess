@@ -3,6 +3,9 @@ from pygame.sprite import Group, AbstractGroup
 import time
 from casa import Casa
 from pecas_models.pecaBase import PecaBase
+from pecas_models.peao import Peao
+from pecas_models.rainha import Rainha
+from pecas_models.rei import Rei
 
 
 class Tabuleiro(pygame.sprite.Sprite):
@@ -105,7 +108,13 @@ class Tabuleiro(pygame.sprite.Sprite):
         peca_movida: PecaBase = self.casa_selecionada.peca
         peca_movida.movimentos += 1
         self.casa_selecionada.remover_peca()
-        casa_destino.inserir_peca(peca_movida)
+        if casa_destino.is_roque:
+            print("Roque")
+        elif casa_destino.is_en_Passant:
+            print("En passant")
+        else:
+            casa_destino.inserir_peca(peca_movida)
+        self.promocao()
         self.trocar_vez()
 
     def trocar_vez(self):
@@ -125,3 +134,29 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.display.blit(txttela, (270, 320))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
         time.sleep(2)
+
+    def promocao(self):
+        for i in range(0, 8):
+            if type(self.vetor_de_Controle[0][i].peca) == Peao:
+                casa: Casa = self.vetor_de_Controle[0][i]
+                peca: Peao = self.vetor_de_Controle[0][i].peca
+                rainha = Rainha(peca.groups(), rect_base=casa.rect, tom=peca.tonalidade, posicao=peca.posicao,casaOrigem=peca.id)
+                self.vetor_de_Controle[0][i].inserir_peca(rainha)
+            if type(self.vetor_de_Controle[7][i].peca) == Peao:
+                casa: Casa = self.vetor_de_Controle[0][i]
+                peca: Peao = self.vetor_de_Controle[7][i].peca
+                rainha = Rainha(peca.groups(), rect_base=casa.rect, tom=peca.tonalidade, posicao=peca.posicao,casaOrigem=peca.id)
+                self.vetor_de_Controle[7][i].inserir_peca(rainha)
+'''
+    def verifica_xeque(self):
+        for i in range(0, 8):
+            for j in range(0, 8):
+                casa: Casa = self.vetor_de_Controle[i][j]
+                if casa.peca is not None:
+                    if casa.peca.tonalidade != self.vez:
+                        casa_possiveis = casa.peca.get_casas_possiveis()
+                        for k in range (0, len(casa_possiveis)):
+                            if type(casa_possiveis[k].peca) == Rei:
+                                casa_possiveis[k].peca.add_xeque()
+
+'''
