@@ -162,18 +162,22 @@ class Tabuleiro(pygame.sprite.Sprite):
     def trocar_vez(self):
         if self.vez == 'claro':
             self.vez = 'escuro'
-            #self.mostrar_vez(jogadorTwo)
+            self.mostrar_vez(jogadorTwo)
         elif self.vez == 'escuro':
             self.vez = 'claro'
-            #self.mostrar_vez(jogadorOne)
+            self.mostrar_vez(jogadorOne)
 
     def mostrar_vez(self, jogador):
+        self.limpar_selecoes();
+        self.desenhar_tabuleiro();
+        pygame.display.update()
+        time.sleep(0.5)
         txt = 'Vez do jogador ' + jogador  ##### armazena o texto
         pygame.font.init()  ##### inicia font
         fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
-        fontesys = pygame.font.SysFont(fonte, 120)  ##### usa a fonte padrão
+        fontesys = pygame.font.SysFont(fonte, 50)  ##### usa a fonte padrão
         txttela = fontesys.render(txt, 1, (255, 255, 255))  ##### renderiza o texto na cor desejada
-        self.display.blit(txttela, (270, 320))  ##### coloca na posição 50,900 (tela FHD)
+        self.display.blit(txttela, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
         time.sleep(2)
 
