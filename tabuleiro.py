@@ -102,6 +102,7 @@ class Tabuleiro(pygame.sprite.Sprite):
         for i in range(0, len(self.casas_possiveis), 1):
             self.casas_possiveis[i].desmarcar_como_possivel()
             self.casas_possiveis[i].is_roque = False
+            self.casas_possiveis[i].is_en_passant = False
 
         self.casas_possiveis.clear()
 
@@ -109,6 +110,7 @@ class Tabuleiro(pygame.sprite.Sprite):
         peca_movida: PecaBase = self.casa_selecionada.peca
         peca_movida.movimentos += 1
         self.casa_selecionada.remover_peca()
+
         if casa_destino.is_roque:
             casa_destino.inserir_peca(peca_movida)
             i = casa_destino.posicao_na_matriz[0]
@@ -125,10 +127,20 @@ class Tabuleiro(pygame.sprite.Sprite):
                 self.vetor_de_Controle[i][0].remover_peca()
                 self.vetor_de_Controle[i][3].inserir_peca(torre)
 
-        elif casa_destino.is_en_Passant:
-            print("En passant")
+        elif casa_destino.is_en_passant:
+            casa_destino.inserir_peca(peca_movida)
+
+            i = casa_destino.posicao_na_matriz[0]
+            j = casa_destino.posicao_na_matriz[1]
+
+            if casa_destino.peca.tonalidade == 'claro':
+                self.vetor_de_Controle[i + 1][j].remover_peca(True)
+            else:
+                self.vetor_de_Controle[i - 1][j].remover_peca(True)
+
         else:
             casa_destino.inserir_peca(peca_movida)
+
         self.promocao()
         self.trocar_vez()
 

@@ -31,7 +31,7 @@ class Casa(pygame.sprite.Sprite):
         self.posicao_na_matriz: tuple[int, int] = posicao_na_matriz
         self.peca: PecaBase = None
         self.is_roque: bool = False
-        self.is_en_Passant: bool = False
+        self.is_en_passant: bool = False
 
         self.tamanho: int = int(display.get_height() / 10)
         x = (posicao_na_matriz[1] * self.tamanho) + ((display.get_width() - (self.tamanho * 8)) / 2)
@@ -92,7 +92,9 @@ class Casa(pygame.sprite.Sprite):
         self.peca.posicao[0] = self.posicao_na_matriz[0]
         self.peca.posicao[1] = self.posicao_na_matriz[1]
 
-    def remover_peca(self):
+    def remover_peca(self, com_sprite: bool = False):
+        if self.peca is not None and com_sprite:
+            self.peca.kill()
         self.peca = None
 
     def carregar_peca(self):
@@ -101,7 +103,7 @@ class Casa(pygame.sprite.Sprite):
 
         if 2 <= i <= 5:
             return
-        
+
         # Peões pretos
         if i == 1:
             self.peca = Peao(self.groups(), rect_base=self.rect.copy(), tom='escuro', posicao=[i, j], casaOrigem=self.posicao)

@@ -44,6 +44,26 @@ class Peao(PecaBase):
                         if tabuleiro[i - 1][j + 1].peca.tonalidade != self.tonalidade:
                             casas_possiveis.append(tabuleiro[i - 1][j + 1])
 
+            # Verificação en_passant peça clara
+            linha = self.posicao[0]
+            coluna = self.posicao[1]
+            if linha == 3:
+                # en_passant direita
+                if coluna < 7:
+                    if tabuleiro[linha][coluna + 1].peca is not None:
+                        if type(tabuleiro[linha][coluna + 1].peca) == Peao and tabuleiro[linha][coluna + 1].peca.movimentos == 1:
+                            casa_en_passant = (tabuleiro[linha - 1][coluna + 1])
+                            casa_en_passant.is_en_passant = True
+                            casas_possiveis.append(casa_en_passant)
+                # en_passant esquerda
+                if coluna > 0:
+                    if tabuleiro[linha][coluna - 1].peca is not None:
+                        if type(tabuleiro[linha][coluna - 1].peca) == Peao and tabuleiro[linha][coluna - 1].peca.movimentos == 1:
+                            casa_en_passant = (tabuleiro[linha - 1][coluna - 1])
+                            casa_en_passant.is_en_passant = True
+                            casas_possiveis.append(casa_en_passant)
+
+
         elif self.tonalidade == 'escuro':
             if i + 1 < 8:
                 if tabuleiro[i + 1][j].peca is None:
@@ -58,6 +78,27 @@ class Peao(PecaBase):
                     if tabuleiro[i + 1][j + 1].peca is not None:
                         if tabuleiro[i + 1][j + 1].peca.tonalidade != self.tonalidade:
                             casas_possiveis.append(tabuleiro[i + 1][j + 1])
+
+            # Verificação en_passant peça escura
+            linha = self.posicao[0]
+            coluna = self.posicao[1]
+            if linha == 4:
+                # en_passant direita
+                if coluna < 7:
+                    if tabuleiro[linha][coluna + 1].peca is not None:
+                        if type(tabuleiro[linha][coluna + 1].peca) == Peao and tabuleiro[linha][
+                            coluna + 1].peca.movimentos == 1:
+                            casa_en_passant = (tabuleiro[linha + 1][coluna + 1])
+                            casa_en_passant.is_en_passant = True
+                            casas_possiveis.append(casa_en_passant)
+                # en_passant esquerda
+                if coluna > 0:
+                    if tabuleiro[linha][coluna - 1].peca is not None:
+                        if type(tabuleiro[linha][coluna - 1].peca) == Peao and tabuleiro[linha][
+                            coluna - 1].peca.movimentos == 1:
+                            casa_en_passant = (tabuleiro[linha + 1][coluna - 1])
+                            casa_en_passant.is_en_passant = True
+                            casas_possiveis.append(casa_en_passant)
 
         return casas_possiveis
 
