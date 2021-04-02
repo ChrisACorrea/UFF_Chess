@@ -13,11 +13,12 @@ class Rei(PecaBase):
     def __init__(self, *groups: AbstractGroup, rect_base: pygame.Rect, tom: str, posicao: tuple[int, int], casaOrigem: str):
         super().__init__(*groups, rect_base=rect_base, tom=tom, posicao=posicao, casaOrigem=casaOrigem)
         self.conta_xeque: int = 0
-        self.xeque_atual: int = 0
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.REI_PRETO
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.REI_BRANCO
+
+        self.ameacantes: list[PecaBase] = []
 
         self.carregar_imagem(self.rect.copy())
 
@@ -98,7 +99,7 @@ class Rei(PecaBase):
 
         return casas_possiveis
 
-    def get_casas_possiveis(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas=False) -> list[tuple[int, int]]:
+    def get_casas_possiveis(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas=False) -> list[Casa]:
 
         casas_possiveis_sem_tratamento: list[Casa] = self.get_casas_possiveis_sem_tratamento(tabuleiro)
         casas_possiveis: list[Casa] = []
@@ -179,11 +180,13 @@ class Rei(PecaBase):
 
     def add_xeque(self):
         self.conta_xeque += 1
-        self.xeque_atual += 1
 
-    def remove_xeque(self):
-        if self.xeque_atual > 0:
-            self.xeque_atual -= 1
+    def add_ameacante(self, ameacante: PecaBase):
+        self.ameacantes.append(ameacante)
+        self.add_xeque()
+
+    def limpar_ameacantes(self):
+        self.ameacantes.clear()
 
     def is_xeque(self):
-        return self.xeque_atual > 0
+        return len(self.ameacantes) > 0

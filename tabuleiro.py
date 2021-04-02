@@ -2,6 +2,7 @@ import pygame
 from pygame.sprite import Group, AbstractGroup
 import time
 from casa import Casa
+from pecas_models.bispo import Bispo
 from pecas_models.pecaBase import PecaBase
 from pecas_models.peao import Peao
 from pecas_models.rainha import Rainha
@@ -21,6 +22,10 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.display = display
         self.altura_tela = display.get_height()
         self.objectGroup = pygame.sprite.Group()
+
+        # variável que guarda a referência dos dois reis para consultas rápidas
+        # branco no indice [0] e preto no indice [1]
+        self.reis: tuple[Rei, Rei] = [None, None]
 
         self.iniciar_tabuleiro()
 
@@ -43,10 +48,16 @@ class Tabuleiro(pygame.sprite.Sprite):
             for j in range(0, 8, 1):
                 self.vetor_de_Controle[i][j].carregar_peca()
 
+                # Guarda a referência dos reis
+                if type(self.vetor_de_Controle[i][j].peca) == Rei:
+                    if self.vetor_de_Controle[i][j].peca.tonalidade == 'claro':
+                        self.reis[0] = self.vetor_de_Controle[i][j].peca
+                    else:
+                        self.reis[1] = self.vetor_de_Controle[i][j].peca
+
     def desenhar_tabuleiro(self) -> None:
         self.objectGroup.draw(self.display)
         return
-
 
     def clicou_dentro_do_tabuleiro(self, posicao_mouse: tuple[int, int]) -> bool:
         if ((self.vetor_de_Controle[0][0].rect.left < posicao_mouse[0] < self.vetor_de_Controle[7][7].rect.right) and
@@ -89,6 +100,9 @@ class Tabuleiro(pygame.sprite.Sprite):
         j: int = posicao_casa_selecionada[1]
 
         self.casas_possiveis = self.vetor_de_Controle[i][j].peca.get_casas_possiveis(self.vetor_de_Controle)
+
+        if self.rei_em_xeque() and type(self.vetor_de_Controle[i][j].peca) != Rei:
+            self.tratar_casas_possiveis()
 
         for i in range(0, len(self.casas_possiveis), 1):
             self.casas_possiveis[i].marcar_como_possivel()
@@ -143,14 +157,15 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         self.promocao()
         self.trocar_vez()
+        self.verifica_xeque()
 
     def trocar_vez(self):
         if self.vez == 'claro':
             self.vez = 'escuro'
-            self.mostrar_vez(jogadorTwo)
+            #self.mostrar_vez(jogadorTwo)
         elif self.vez == 'escuro':
             self.vez = 'claro'
-            self.mostrar_vez(jogadorOne)
+            #self.mostrar_vez(jogadorOne)
 
     def mostrar_vez(self, jogador):
         txt = 'Vez do jogador ' + jogador  ##### armazena o texto
@@ -174,16 +189,60 @@ class Tabuleiro(pygame.sprite.Sprite):
                 peca: Peao = self.vetor_de_Controle[7][i].peca
                 rainha = Rainha(peca.groups(), rect_base=casa.rect, tom=peca.tonalidade, posicao=peca.posicao,casaOrigem=peca.id)
                 self.vetor_de_Controle[7][i].inserir_peca(rainha)
-'''
+
     def verifica_xeque(self):
+        self.get_rei_da_vez().limpar_ameacantes()
+
         for i in range(0, 8):
             for j in range(0, 8):
                 casa: Casa = self.vetor_de_Controle[i][j]
                 if casa.peca is not None:
                     if casa.peca.tonalidade != self.vez:
-                        casa_possiveis = casa.peca.get_casas_possiveis()
-                        for k in range (0, len(casa_possiveis)):
+                        casa_possiveis = casa.peca.get_casas_possiveis(self.vetor_de_Controle)
+                        for k in range(0, len(casa_possiveis)):
                             if type(casa_possiveis[k].peca) == Rei:
-                                casa_possiveis[k].peca.add_xeque()
+                                casa_possiveis[k].peca.add_ameacante(casa.peca)
 
-'''
+    def get_rei_da_vez(self) -> Rei:
+        return self.reis[0] if self.vez == 'claro' else self.reis[1]
+
+    def rei_em_xeque(self) -> bool:
+        return self.get_rei_da_vez().is_xeque()
+
+    def tratar_casas_possiveis(self):
+        rei_da_vez: Rei = self.get_rei_da_vez()
+        posicao_rei = rei_da_vez.posicao
+        ameacantes: list[PecaBase] = rei_da_vez.ameacantes
+        casas_de_salvamento: list[Casa] = []
+        casas_de_defesa: list[Casa] = []
+
+        for i in range(0, len(ameacantes)):
+            posicao_ameacante = ameacantes[i].posicao
+            casas_de_salvamento.append(self.vetor_de_Controle[posicao_ameacante[0]][posicao_ameacante[1]])
+
+            if posicao_rei[0] == posicao_ameacante[0]:
+                step = 1 if posicao_ameacante[1] > posicao_rei[1] else -1
+                for coluna in range(posicao_rei[1] + step, posicao_ameacante[1]):
+                    casas_de_salvamento.append(self.vetor_de_Controle[posicao_rei[0]][coluna])
+            elif posicao_rei[1] == posicao_ameacante[1]:
+                step = 1 if posicao_ameacante[0] > posicao_rei[0] else -1
+                for linha in range(posicao_rei[0] + step, posicao_ameacante[0]):
+                    casas_de_salvamento.append(self.vetor_de_Controle[linha][posicao_rei[1]])
+            else:
+                if type(ameacantes[i]) == Bispo or type(ameacantes[i]) == Rainha:
+                    step_l = 1 if posicao_ameacante[0] > posicao_rei[0] else -1
+                    step_c = 1 if posicao_ameacante[1] > posicao_rei[1] else -1
+                    linha = posicao_rei[0] + step_l
+                    coluna = posicao_rei[1] + step_c
+                    while posicao_ameacante[0] != linha and posicao_ameacante[1] != coluna:
+                        casas_de_salvamento.append(self.vetor_de_Controle[linha][coluna])
+                        linha += step_l
+                        coluna += step_c
+
+        for i in range(0, len(self.casas_possiveis)):
+            for j in range(0, len(casas_de_salvamento)):
+                if self.casas_possiveis[i].posicao == casas_de_salvamento[j].posicao:
+                    casas_de_defesa.append(casas_de_salvamento[j])
+
+        self.casas_possiveis.clear()
+        self.casas_possiveis.extend(casas_de_defesa)
