@@ -7,6 +7,7 @@ from pecas_models.pecaBase import PecaBase
 from pecas_models.peao import Peao
 from pecas_models.rainha import Rainha
 from pecas_models.rei import Rei
+from pecas_models.torre import Torre
 
 
 class Tabuleiro(pygame.sprite.Sprite):
@@ -101,7 +102,11 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         self.casas_possiveis = self.vetor_de_Controle[i][j].peca.get_casas_possiveis(self.vetor_de_Controle)
 
+        # Não permite que uma peça saia do lugar e deixe seu rei em xeque
+        self.tratar_possivel_xeque(self.vetor_de_Controle[i][j].peca)
+
         if self.rei_em_xeque() and type(self.vetor_de_Controle[i][j].peca) != Rei:
+            # Deixa como casas possíveis somente aquelas entre o rei e o ameaçante (incluindo o ameaçante)
             self.tratar_casas_possiveis()
 
         for i in range(0, len(self.casas_possiveis), 1):
@@ -250,3 +255,259 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         self.casas_possiveis.clear()
         self.casas_possiveis.extend(casas_de_defesa)
+
+    def tratar_possivel_xeque(self, peca_selecionada: PecaBase):
+        posicao_peca = peca_selecionada.posicao
+        caminho_da_salvacao: list[Casa] = []
+        caminho_da_morte = self.get_caminho_da_morte(posicao_peca)
+
+        if len(caminho_da_morte) != 0:
+            for i in range(0, len(self.casas_possiveis)):
+                for j in range(0, len(caminho_da_morte)):
+                    if self.casas_possiveis[i].posicao == caminho_da_morte[j].posicao:
+                        caminho_da_salvacao.append(caminho_da_morte[j])
+
+            self.casas_possiveis.clear()
+            self.casas_possiveis.extend(caminho_da_salvacao)
+
+
+    def get_casas_superior(self, posicao_atual: tuple[int, int]):
+        casas_encontradas: list[Casa] = []
+        i = posicao_atual[0]
+        j = posicao_atual[1]
+
+        while i >= 1:
+            i -= 1
+            if self.vetor_de_Controle[i][j].peca is None:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+            else:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+                break
+
+        return casas_encontradas
+
+    def get_casas_inferior(self, posicao_atual: tuple[int, int]):
+        casas_encontradas: list[Casa] = []
+        i = posicao_atual[0]
+        j = posicao_atual[1]
+
+        while i < 7:
+            i += 1
+            if self.vetor_de_Controle[i][j].peca is None:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+            else:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+                break
+
+        return casas_encontradas
+
+    def get_casas_direita(self, posicao_atual: tuple[int, int]):
+        casas_encontradas: list[Casa] = []
+        i = posicao_atual[0]
+        j = posicao_atual[1]
+
+        while j < 7:
+            j += 1
+            if self.vetor_de_Controle[i][j].peca is None:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+            else:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+                break
+
+        return casas_encontradas
+
+    def get_casas_esquerda(self, posicao_atual: tuple[int, int]):
+        casas_encontradas: list[Casa] = []
+        i = posicao_atual[0]
+        j = posicao_atual[1]
+
+        while j >= 1:
+            j -= 1
+            if self.vetor_de_Controle[i][j].peca is None:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+            else:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+                break
+
+        return casas_encontradas
+
+    def get_casas_diagonal_superior_direita(self, posicao_atual: tuple[int, int]):
+        casas_encontradas: list[Casa] = []
+        i = posicao_atual[0]
+        j = posicao_atual[1]
+
+        while i >= 1 and j < 7:
+            i -= 1
+            j += 1
+            if self.vetor_de_Controle[i][j].peca is None:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+            else:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+                break
+
+        return casas_encontradas
+
+    def get_casas_diagonal_inferior_direita(self, posicao_atual: tuple[int, int]):
+        casas_encontradas: list[Casa] = []
+        i = posicao_atual[0]
+        j = posicao_atual[1]
+
+        while i < 7 and j < 7:
+            i += 1
+            j += 1
+            if self.vetor_de_Controle[i][j].peca is None:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+            else:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+                break
+
+        return casas_encontradas
+
+    def get_casas_diagonal_inferior_esquerda(self, posicao_atual: tuple[int, int]):
+        casas_encontradas: list[Casa] = []
+        i = posicao_atual[0]
+        j = posicao_atual[1]
+
+        while i < 7 and j >= 1:
+            i += 1
+            j -= 1
+            if self.vetor_de_Controle[i][j].peca is None:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+            else:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+                break
+
+        return casas_encontradas
+
+    def get_casas_diagonal_superior_esquerda(self, posicao_atual: tuple[int, int]):
+        casas_encontradas: list[Casa] = []
+        i = posicao_atual[0]
+        j = posicao_atual[1]
+
+        while i >= 1 and j >= 1:
+            i -= 1
+            j -= 1
+            if self.vetor_de_Controle[i][j].peca is None:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+            else:
+                casas_encontradas.append(self.vetor_de_Controle[i][j])
+                break
+
+        return casas_encontradas
+
+    def get_caminho_da_morte(self, posicao_peca):
+        caminho_da_morte: list[Casa] = []
+
+        direcao_rei = self.get_casas_superior(posicao_peca)
+        if len(direcao_rei) != 0:
+            if type(direcao_rei[-1].peca) == Rei and direcao_rei[-1].peca.tonalidade == self.vez:
+                direcao_contraria = self.get_casas_inferior(posicao_peca)
+                if len(direcao_contraria) != 0:
+                    if direcao_contraria[-1].peca is not None:
+                        if direcao_contraria[-1].peca.tonalidade != self.vez:
+                            if type(direcao_contraria[-1].peca) == Rainha or type(direcao_contraria[-1].peca) == Torre:
+                                caminho_da_morte.extend(direcao_contraria)
+                                caminho_da_morte.extend(direcao_rei)
+                                return caminho_da_morte
+                    else:
+                        return caminho_da_morte
+
+        direcao_rei = self.get_casas_inferior(posicao_peca)
+        if len(direcao_rei) != 0:
+            if type(direcao_rei[-1].peca) == Rei and direcao_rei[-1].peca.tonalidade == self.vez:
+                direcao_contraria = self.get_casas_superior(posicao_peca)
+                if len(direcao_contraria) != 0:
+                    if direcao_contraria[-1].peca is not None:
+                        if direcao_contraria[-1].peca.tonalidade != self.vez:
+                            if type(direcao_contraria[-1].peca) == Rainha or type(direcao_contraria[-1].peca) == Torre:
+                                caminho_da_morte.extend(direcao_contraria)
+                                caminho_da_morte.extend(direcao_rei)
+                                return caminho_da_morte
+                    else:
+                        return caminho_da_morte
+
+        direcao_rei = self.get_casas_direita(posicao_peca)
+        if len(direcao_rei) != 0:
+            if type(direcao_rei[-1].peca) == Rei and direcao_rei[-1].peca.tonalidade == self.vez:
+                direcao_contraria = self.get_casas_esquerda(posicao_peca)
+                if len(direcao_contraria) != 0:
+                    if direcao_contraria[-1].peca is not None:
+                        if direcao_contraria[-1].peca.tonalidade != self.vez:
+                            if type(direcao_contraria[-1].peca) == Rainha or type(direcao_contraria[-1].peca) == Torre:
+                                caminho_da_morte.extend(direcao_contraria)
+                                caminho_da_morte.extend(direcao_rei)
+                                return caminho_da_morte
+                    else:
+                        return caminho_da_morte
+
+        direcao_rei = self.get_casas_esquerda(posicao_peca)
+        if len(direcao_rei) != 0:
+            if type(direcao_rei[-1].peca) == Rei and direcao_rei[-1].peca.tonalidade == self.vez:
+                direcao_contraria = self.get_casas_direita(posicao_peca)
+                if len(direcao_contraria) != 0:
+                    if direcao_contraria[-1].peca is not None:
+                        if direcao_contraria[-1].peca.tonalidade != self.vez:
+                            if type(direcao_contraria[-1].peca) == Rainha or type(direcao_contraria[-1].peca) == Torre:
+                                caminho_da_morte.extend(direcao_contraria)
+                                caminho_da_morte.extend(direcao_rei)
+                                return caminho_da_morte
+                    else:
+                        return caminho_da_morte
+
+        direcao_rei = self.get_casas_diagonal_superior_direita(posicao_peca)
+        if len(direcao_rei) != 0:
+            if type(direcao_rei[-1].peca) == Rei and direcao_rei[-1].peca.tonalidade == self.vez:
+                direcao_contraria = self.get_casas_diagonal_inferior_esquerda(posicao_peca)
+                if len(direcao_contraria) != 0:
+                    if direcao_contraria[-1].peca is not None:
+                        if direcao_contraria[-1].peca.tonalidade != self.vez:
+                            if type(direcao_contraria[-1].peca) == Rainha or type(direcao_contraria[-1].peca) == Bispo:
+                                caminho_da_morte.extend(direcao_contraria)
+                                caminho_da_morte.extend(direcao_rei)
+                                return caminho_da_morte
+                    else:
+                        return caminho_da_morte
+
+        direcao_rei = self.get_casas_diagonal_inferior_esquerda(posicao_peca)
+        if len(direcao_rei) != 0:
+            if type(direcao_rei[-1].peca) == Rei and direcao_rei[-1].peca.tonalidade == self.vez:
+                direcao_contraria = self.get_casas_diagonal_superior_direita(posicao_peca)
+                if len(direcao_contraria) != 0:
+                    if direcao_contraria[-1].peca is not None:
+                        if direcao_contraria[-1].peca.tonalidade != self.vez:
+                            if type(direcao_contraria[-1].peca) == Rainha or type(direcao_contraria[-1].peca) == Bispo:
+                                caminho_da_morte.extend(direcao_contraria)
+                                caminho_da_morte.extend(direcao_rei)
+                                return caminho_da_morte
+                    else:
+                        return caminho_da_morte
+
+        direcao_rei = self.get_casas_diagonal_inferior_direita(posicao_peca)
+        if len(direcao_rei) != 0:
+            if type(direcao_rei[-1].peca) == Rei and direcao_rei[-1].peca.tonalidade == self.vez:
+                direcao_contraria = self.get_casas_diagonal_superior_esquerda(posicao_peca)
+                if len(direcao_contraria) != 0:
+                    if direcao_contraria[-1].peca is not None:
+                        if direcao_contraria[-1].peca.tonalidade != self.vez:
+                            if type(direcao_contraria[-1].peca) == Rainha or type(direcao_contraria[-1].peca) == Bispo:
+                                caminho_da_morte.extend(direcao_contraria)
+                                caminho_da_morte.extend(direcao_rei)
+                                return caminho_da_morte
+                    else:
+                        return caminho_da_morte
+
+        direcao_rei = self.get_casas_diagonal_superior_esquerda(posicao_peca)
+        if len(direcao_rei) != 0:
+            if type(direcao_rei[-1].peca) == Rei and direcao_rei[-1].peca.tonalidade == self.vez:
+                direcao_contraria = self.get_casas_diagonal_inferior_direita(posicao_peca)
+                if len(direcao_contraria) != 0:
+                    if direcao_contraria[-1].peca is not None:
+                        if direcao_contraria[-1].peca.tonalidade != self.vez:
+                            if type(direcao_contraria[-1].peca) == Rainha or type(direcao_contraria[-1].peca) == Bispo:
+                                caminho_da_morte.extend(direcao_contraria)
+                                caminho_da_morte.extend(direcao_rei)
+                                return caminho_da_morte
+                    else:
+                        return caminho_da_morte
+
+        return caminho_da_morte
