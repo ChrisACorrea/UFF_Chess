@@ -103,11 +103,14 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.casas_possiveis = self.vetor_de_Controle[i][j].peca.get_casas_possiveis(self.vetor_de_Controle)
 
         # Não permite que uma peça saia do lugar e deixe seu rei em xeque
-        self.tratar_possivel_xeque(self.vetor_de_Controle[i][j].peca)
+        casas_xeque_tratadas = self.tratar_possivel_xeque(self.vetor_de_Controle[i][j].peca, self.casas_possiveis)
+        if casas_xeque_tratadas is not None:
+            self.casas_possiveis.clear()
+            self.casas_possiveis.extend(casas_xeque_tratadas)
 
         if self.rei_em_xeque() and type(self.vetor_de_Controle[i][j].peca) != Rei:
             # Deixa como casas possíveis somente aquelas entre o rei e o ameaçante (incluindo o ameaçante)
-            self.tratar_casas_possiveis()
+            self.casas_possiveis = self.tratar_casas_possiveis(self.casas_possiveis)
 
         for i in range(0, len(self.casas_possiveis), 1):
             self.casas_possiveis[i].marcar_como_possivel()
@@ -163,6 +166,7 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.promocao()
         self.trocar_vez()
         self.verifica_xeque()
+        self.houve_xeque_mate()
 
     def trocar_vez(self):
         if self.vez == 'claro':
@@ -218,7 +222,7 @@ class Tabuleiro(pygame.sprite.Sprite):
     def rei_em_xeque(self) -> bool:
         return self.get_rei_da_vez().is_xeque()
 
-    def tratar_casas_possiveis(self):
+    def tratar_casas_possiveis(self, casas_possiveis: list[Casa]):
         rei_da_vez: Rei = self.get_rei_da_vez()
         posicao_rei = rei_da_vez.posicao
         ameacantes: list[PecaBase] = rei_da_vez.ameacantes
@@ -248,28 +252,27 @@ class Tabuleiro(pygame.sprite.Sprite):
                         linha += step_l
                         coluna += step_c
 
-        for i in range(0, len(self.casas_possiveis)):
+        for i in range(0, len(casas_possiveis)):
             for j in range(0, len(casas_de_salvamento)):
-                if self.casas_possiveis[i].posicao == casas_de_salvamento[j].posicao:
+                if casas_possiveis[i].posicao == casas_de_salvamento[j].posicao:
                     casas_de_defesa.append(casas_de_salvamento[j])
 
-        self.casas_possiveis.clear()
-        self.casas_possiveis.extend(casas_de_defesa)
+        return casas_de_defesa
 
-    def tratar_possivel_xeque(self, peca_selecionada: PecaBase):
+    def tratar_possivel_xeque(self, peca_selecionada: PecaBase, casas_possiveis: list[Casa]):
         posicao_peca = peca_selecionada.posicao
         caminho_da_salvacao: list[Casa] = []
         caminho_da_morte = self.get_caminho_da_morte(posicao_peca)
 
         if len(caminho_da_morte) != 0:
-            for i in range(0, len(self.casas_possiveis)):
+            for i in range(0, len(casas_possiveis)):
                 for j in range(0, len(caminho_da_morte)):
-                    if self.casas_possiveis[i].posicao == caminho_da_morte[j].posicao:
+                    if casas_possiveis[i].posicao == caminho_da_morte[j].posicao:
                         caminho_da_salvacao.append(caminho_da_morte[j])
 
-            self.casas_possiveis.clear()
-            self.casas_possiveis.extend(caminho_da_salvacao)
+            return caminho_da_salvacao
 
+        return None
 
     def get_casas_superior(self, posicao_atual: tuple[int, int]):
         casas_encontradas: list[Casa] = []
@@ -511,3 +514,31 @@ class Tabuleiro(pygame.sprite.Sprite):
                         return caminho_da_morte
 
         return caminho_da_morte
+
+    def houve_xeque_mate(self):
+        todas_casas_possiveis: list[Casa] = []
+
+        for i in range(8):
+            for j in range(8):
+                if self.vetor_de_Controle[i][j].peca is not None:
+                    peca = self.vetor_de_Controle[i][j].peca
+                    if peca.tonalidade == self.vez:
+                        casas_possiveis_peca = peca.get_casas_possiveis(self.vetor_de_Controle)
+                        casas_possivel_cheque_tratadas = self.tratar_possivel_xeque(peca, casas_possiveis_peca)
+                        if casas_possivel_cheque_tratadas is not None:
+                            todas_casas_possiveis.extend(casas_possivel_cheque_tratadas)
+                        todas_casas_possiveis = self.tratar_casas_possiveis(todas_casas_possiveis)
+
+        if len(todas_casas_possiveis) == 0 and self.get_rei_da_vez().is_xeque():
+            self.mostrar_msg_xeque_mate()
+            print("XEQUE MATE SEU OTÁRIO")
+
+    def mostrar_msg_xeque_mate(self):
+        txt = 'XEQUE-MATE'  ##### armazena o texto
+        pygame.font.init()  ##### inicia font
+        fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
+        fontesys = pygame.font.SysFont(fonte, 200)  ##### usa a fonte padrão
+        txttela = fontesys.render(txt, 1, (255, 255, 255), (0, 0, 0))  ##### renderiza o texto na cor desejada
+        self.display.blit(txttela, ((self.display.get_width() / 2) - (txttela.get_width() / 2), (self.display.get_height() / 2) - (txttela.get_height() / 2)))  ##### coloca na posição 50,900 (tela FHD)
+        pygame.display.update()
+        time.sleep(10)
