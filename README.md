@@ -6,3 +6,4 @@
     <li> <b> Conteúdo: </b> <li>
     <li>Slides: "Slides - Seminário 02.pdf"<li>
     <li>Relatório: "TRABALHO DA DISCIPLINA DE GERÊNCIA DE PROJETOS E MANUTENÇÃO DE SOFTWARE.pdf"<li>
+<ul>
