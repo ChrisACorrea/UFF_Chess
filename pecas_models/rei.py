@@ -12,12 +12,13 @@ class Rei(PecaBase):
 
     def __init__(self, *groups: AbstractGroup, rect_base: pygame.Rect, tom: str, posicao: tuple[int, int], casaOrigem: str):
         super().__init__(*groups, rect_base=rect_base, tom=tom, posicao=posicao, casaOrigem=casaOrigem)
-        conta_xaque = 0
-        xeque = False
+        self.conta_xeque: int = 0
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.REI_PRETO
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.REI_BRANCO
+
+        self.ameacantes: list[PecaBase] = []
 
         self.carregar_imagem(self.rect.copy())
 
@@ -98,7 +99,7 @@ class Rei(PecaBase):
 
         return casas_possiveis
 
-    def get_casas_possiveis(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas=False) -> list[tuple[int, int]]:
+    def get_casas_possiveis(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas=False) -> list[Casa]:
 
         casas_possiveis_sem_tratamento: list[Casa] = self.get_casas_possiveis_sem_tratamento(tabuleiro)
         casas_possiveis: list[Casa] = []
@@ -136,6 +137,28 @@ class Rei(PecaBase):
             linha += 1
             coluna = 0
 
+            # Verifica movimentos do roque
+            if self.movimentos == 0 and self.conta_xeque < 1:
+                # Verifica lado direito
+                if tabuleiro[self.posicao[0]][7].peca is not None:
+                    if tabuleiro[self.posicao[0]][7].peca.movimentos == 0:
+                        if (tabuleiro[self.posicao[0]][5].peca is None and
+                                tabuleiro[self.posicao[0]][6].peca is None):
+                            casa_roque_d: Casa = tabuleiro[self.posicao[0]][6]
+                            casa_roque_d.is_roque = True
+                            casas_possiveis_sem_tratamento.append(casa_roque_d)
+
+                # Verifica lado esquerdo
+                if tabuleiro[self.posicao[0]][0].peca is not None:
+                    if tabuleiro[self.posicao[0]][0].peca.movimentos == 0:
+                        if (tabuleiro[self.posicao[0]][1].peca is None and
+                                tabuleiro[self.posicao[0]][2].peca is None and
+                                tabuleiro[self.posicao[0]][3].peca is None):
+                            casa_roque_e: Casa = tabuleiro[self.posicao[0]][2]
+                            casa_roque_e.is_roque = True
+                            casas_possiveis_sem_tratamento.append(casa_roque_e)
+
+        # -----
         i = 0
         j = 0
         tam_possiveis = len(casas_possiveis_sem_tratamento)
@@ -146,6 +169,7 @@ class Rei(PecaBase):
             while(j < tam_nao_possiveis):
                 if (casas_possiveis_sem_tratamento[i].posicao == casas_nao_possiveis[j].posicao):
                     tem_igual = True
+                    casas_possiveis_sem_tratamento[i].is_roque = False
                 j += 1
             if not tem_igual:
                 casas_possiveis.append(casas_possiveis_sem_tratamento[i])
@@ -156,10 +180,13 @@ class Rei(PecaBase):
 
     def add_xeque(self):
         self.conta_xeque += 1
-        self.xeque = True
 
-    def remove_xeque(self):
-        self.xeque = False
+    def add_ameacante(self, ameacante: PecaBase):
+        self.ameacantes.append(ameacante)
+        self.add_xeque()
+
+    def limpar_ameacantes(self):
+        self.ameacantes.clear()
 
     def is_xeque(self):
-        return self.xeque
+        return len(self.ameacantes) > 0
