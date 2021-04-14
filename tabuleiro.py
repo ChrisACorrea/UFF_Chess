@@ -117,7 +117,7 @@ class Tabuleiro(pygame.sprite.Sprite):
 
     def limpar_selecoes(self):
         if self.casa_selecionada:
-            self.casa_selecionada.desmarcar_como_selecionado()
+           self.casa_selecionada.desmarcar_como_selecionado()
 
         self.casa_selecionada = None
 
@@ -233,16 +233,24 @@ class Tabuleiro(pygame.sprite.Sprite):
             posicao_ameacante = ameacantes[i].posicao
             casas_de_salvamento.append(self.vetor_de_Controle[posicao_ameacante[0]][posicao_ameacante[1]])
 
+            # Verifica se estão na mesma linha
             if posicao_rei[0] == posicao_ameacante[0]:
-                step = 1 if posicao_ameacante[1] > posicao_rei[1] else -1
+                # verifica se o ameaçante está a direita ou a esquerda
+                step = 1 if posicao_ameacante[1] > posicao_rei[1] else -1 
+                # Varre as casas entre o rei e ameaçante e salva em casa_de_salvamento
                 for coluna in range(posicao_rei[1] + step, posicao_ameacante[1]):
                     casas_de_salvamento.append(self.vetor_de_Controle[posicao_rei[0]][coluna])
+            # Verifica se estão na mesma coluna
             elif posicao_rei[1] == posicao_ameacante[1]:
+                # Verifica se o ameaçante está acima ou abaixo do rei
                 step = 1 if posicao_ameacante[0] > posicao_rei[0] else -1
+                # Varre as casas entre o rei e ameaçante e salva em casa_de_salvamento
                 for linha in range(posicao_rei[0] + step, posicao_ameacante[0]):
                     casas_de_salvamento.append(self.vetor_de_Controle[linha][posicao_rei[1]])
+            # Verifica se estão na mesma diagonal
             else:
                 if type(ameacantes[i]) == Bispo or type(ameacantes[i]) == Rainha:
+                    # Verifica em qual diagonal o ameaçante está
                     step_l = 1 if posicao_ameacante[0] > posicao_rei[0] else -1
                     step_c = 1 if posicao_ameacante[1] > posicao_rei[1] else -1
                     linha = posicao_rei[0] + step_l
@@ -523,13 +531,16 @@ class Tabuleiro(pygame.sprite.Sprite):
                 if self.vetor_de_Controle[i][j].peca is not None:
                     peca = self.vetor_de_Controle[i][j].peca
                     if peca.tonalidade == self.vez:
-                        todas_casas_possiveis.extend(peca.get_casas_possiveis(self.vetor_de_Controle))
+                        casas_possiveis_peca = peca.get_casas_possiveis(self.vetor_de_Controle)
                         casas_possivel_cheque_tratadas = self.tratar_possivel_xeque(peca, todas_casas_possiveis)
                         if casas_possivel_cheque_tratadas is not None:
-                            todas_casas_possiveis.extend(casas_possivel_cheque_tratadas)
+                            casas_possiveis_peca.clear()
+                            casas_possiveis_peca.extend(casas_possivel_cheque_tratadas)
                         if self.rei_em_xeque() and type(self.vetor_de_Controle[i][j].peca) != Rei:
-                            todas_casas_possiveis = self.tratar_casas_possiveis(todas_casas_possiveis)
-
+                            casas_tratadas = self.tratar_casas_possiveis(casas_possiveis_peca)
+                            casas_possiveis_peca.clear()
+                            casas_possiveis_peca.extend(casas_tratadas)
+                        todas_casas_possiveis.extend(casas_possiveis_peca)
 
         if len(todas_casas_possiveis) == 0 and self.get_rei_da_vez().is_xeque():
             self.mostrar_msg_xeque_mate()

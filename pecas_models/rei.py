@@ -135,22 +135,27 @@ class Rei(PecaBase):
                                             casas_ameacadas.append(tabuleiro[self.posicao[0] + 1][self.posicao[1]])
                                         elif (self.posicao[0] < self.ameacantes[i].posicao[0]) and (self.posicao[0] > 0):
                                             casas_ameacadas.append(tabuleiro[self.posicao[0] - 1][self.posicao[1]])
-                                    else:
+                                    else: 
+                                        # Verifica ameaçante no casa superior direita
                                         if((self.posicao[0] > self.ameacantes[i].posicao[0]) and
                                             (self.posicao[1] < self.ameacantes[i].posicao[1])):
+                                            #Verifica casa no canto inferior esquerdo
                                             if (self.posicao[0] < 7) and (self.posicao[1] > 0):
                                                 casas_ameacadas.append(tabuleiro[self.posicao[0] + 1][self.posicao[1] - 1])
+                                        # Verifica ameaçante no casa inferior direita
                                         if ((self.posicao[0] < self.ameacantes[i].posicao[0]) and
                                                 (self.posicao[1] < self.ameacantes[i].posicao[1])):
                                             if (self.posicao[0] > 0) and (self.posicao[1] > 0):
                                                 casas_ameacadas.append(tabuleiro[self.posicao[0] - 1][self.posicao[1] - 1])
+                                        # Verifica ameaçante no casa inferior esquerdo
                                         if ((self.posicao[0] < self.ameacantes[i].posicao[0]) and
                                                 (self.posicao[1] > self.ameacantes[i].posicao[1])):
-                                            if (self.posicao[0] > 0) and (self.posicao[1] > 0):
+                                            if (self.posicao[0] > 0) and (self.posicao[1] < 7):
                                                 casas_ameacadas.append(tabuleiro[self.posicao[0] - 1][self.posicao[1] + 1])
+                                        # Verifica ameaçante no casa superior esquerdo
                                         if ((self.posicao[0] > self.ameacantes[i].posicao[0]) and
                                                 (self.posicao[1] > self.ameacantes[i].posicao[1])):
-                                            if (self.posicao[0] < 7) and (self.posicao[1] > 0):
+                                            if (self.posicao[0] < 7) and (self.posicao[1] < 7):
                                                 casas_ameacadas.append(tabuleiro[self.posicao[0] + 1][self.posicao[1] + 1])
 
                         if len(casas_nao_possiveis) == 0:
