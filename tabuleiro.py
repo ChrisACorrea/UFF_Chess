@@ -523,11 +523,13 @@ class Tabuleiro(pygame.sprite.Sprite):
                 if self.vetor_de_Controle[i][j].peca is not None:
                     peca = self.vetor_de_Controle[i][j].peca
                     if peca.tonalidade == self.vez:
-                        casas_possiveis_peca = peca.get_casas_possiveis(self.vetor_de_Controle)
-                        casas_possivel_cheque_tratadas = self.tratar_possivel_xeque(peca, casas_possiveis_peca)
+                        todas_casas_possiveis.extend(peca.get_casas_possiveis(self.vetor_de_Controle))
+                        casas_possivel_cheque_tratadas = self.tratar_possivel_xeque(peca, todas_casas_possiveis)
                         if casas_possivel_cheque_tratadas is not None:
                             todas_casas_possiveis.extend(casas_possivel_cheque_tratadas)
-                        todas_casas_possiveis = self.tratar_casas_possiveis(todas_casas_possiveis)
+                        if self.rei_em_xeque() and type(self.vetor_de_Controle[i][j].peca) != Rei:
+                            todas_casas_possiveis = self.tratar_casas_possiveis(todas_casas_possiveis)
+
 
         if len(todas_casas_possiveis) == 0 and self.get_rei_da_vez().is_xeque():
             self.mostrar_msg_xeque_mate()
@@ -541,4 +543,4 @@ class Tabuleiro(pygame.sprite.Sprite):
         txttela = fontesys.render(txt, 1, (255, 255, 255), (0, 0, 0))  ##### renderiza o texto na cor desejada
         self.display.blit(txttela, ((self.display.get_width() / 2) - (txttela.get_width() / 2), (self.display.get_height() / 2) - (txttela.get_height() / 2)))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
-        time.sleep(10)
+        time.sleep(2)

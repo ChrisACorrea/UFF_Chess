@@ -122,6 +122,37 @@ class Rei(PecaBase):
                         else:
                             casas_ameacadas = tabuleiro[linha][coluna].peca.get_casas_possiveis(tabuleiro, True)
 
+                        if len(self.ameacantes) > 0:
+                            for i in range(len(self.ameacantes)):
+                                if type(self.ameacantes[i]) != Rei or type(self.ameacantes[i]) != Peao:
+                                    if self.posicao[0] == self.ameacantes[i].posicao[0]:
+                                        if(self.posicao[1] > self.ameacantes[i].posicao[1]) and (self.posicao[1] < 7):
+                                            casas_ameacadas.append(tabuleiro[self.posicao[0]][self.posicao[1] + 1])
+                                        elif (self.posicao[1] < self.ameacantes[i].posicao[1]) and (self.posicao[1] > 0):
+                                            casas_ameacadas.append(tabuleiro[self.posicao[0]][self.posicao[1] - 1])
+                                    elif self.posicao[1] == self.ameacantes[i].posicao[1]:
+                                        if(self.posicao[0] > self.ameacantes[i].posicao[0]) and (self.posicao[0] < 7):
+                                            casas_ameacadas.append(tabuleiro[self.posicao[0] + 1][self.posicao[1]])
+                                        elif (self.posicao[0] < self.ameacantes[i].posicao[0]) and (self.posicao[0] > 0):
+                                            casas_ameacadas.append(tabuleiro[self.posicao[0] - 1][self.posicao[1]])
+                                    else:
+                                        if((self.posicao[0] > self.ameacantes[i].posicao[0]) and
+                                            (self.posicao[1] < self.ameacantes[i].posicao[1])):
+                                            if (self.posicao[0] < 7) and (self.posicao[1] > 0):
+                                                casas_ameacadas.append(tabuleiro[self.posicao[0] + 1][self.posicao[1] - 1])
+                                        if ((self.posicao[0] < self.ameacantes[i].posicao[0]) and
+                                                (self.posicao[1] < self.ameacantes[i].posicao[1])):
+                                            if (self.posicao[0] > 0) and (self.posicao[1] > 0):
+                                                casas_ameacadas.append(tabuleiro[self.posicao[0] - 1][self.posicao[1] - 1])
+                                        if ((self.posicao[0] < self.ameacantes[i].posicao[0]) and
+                                                (self.posicao[1] > self.ameacantes[i].posicao[1])):
+                                            if (self.posicao[0] > 0) and (self.posicao[1] > 0):
+                                                casas_ameacadas.append(tabuleiro[self.posicao[0] - 1][self.posicao[1] + 1])
+                                        if ((self.posicao[0] > self.ameacantes[i].posicao[0]) and
+                                                (self.posicao[1] > self.ameacantes[i].posicao[1])):
+                                            if (self.posicao[0] < 7) and (self.posicao[1] > 0):
+                                                casas_ameacadas.append(tabuleiro[self.posicao[0] + 1][self.posicao[1] + 1])
+
                         if len(casas_nao_possiveis) == 0:
                             casas_nao_possiveis.extend(casas_ameacadas)
                         else:
