@@ -18,6 +18,7 @@ class Rei(PecaBase):
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.REI_BRANCO
 
+        # Array de deverá guardar todas as peças que ameaçam o Rei em uma jogada.
         self.ameacantes: list[PecaBase] = []
 
         self.carregar_imagem(self.rect.copy())
@@ -27,6 +28,14 @@ class Rei(PecaBase):
         self.image = pygame.transform.smoothscale(self.image, [self.rect.width, self.rect.height])
 
     def get_casas_possiveis_sem_tratamento(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas=False) -> list[Casa]:
+        """
+        Função exclusiva do Rei.
+        Pega todas as casas nas quais a Rei pode ser jogado, porém ser fazer verificação se a casa está sendo ameaçada.
+
+        :param tabuleiro:
+        :param incluir_casas_ameacadas:
+        :return:
+        """
 
         i: int = self.posicao[0]
         j: int = self.posicao[1]
@@ -122,24 +131,32 @@ class Rei(PecaBase):
                         else:
                             casas_ameacadas = tabuleiro[linha][coluna].peca.get_casas_possiveis(tabuleiro, True)
 
+                        # Se o Rei estiver em xeque, verifica a posição do ameaçante e não permite que o Rei ande
+                        # na direção oposta.
                         if len(self.ameacantes) > 0:
                             for i in range(len(self.ameacantes)):
                                 if type(self.ameacantes[i]) != Rei or type(self.ameacantes[i]) != Peao:
+
+                                    # Rei está na mesma linha que ameaçante?
                                     if self.posicao[0] == self.ameacantes[i].posicao[0]:
                                         if(self.posicao[1] > self.ameacantes[i].posicao[1]) and (self.posicao[1] < 7):
                                             casas_ameacadas.append(tabuleiro[self.posicao[0]][self.posicao[1] + 1])
                                         elif (self.posicao[1] < self.ameacantes[i].posicao[1]) and (self.posicao[1] > 0):
                                             casas_ameacadas.append(tabuleiro[self.posicao[0]][self.posicao[1] - 1])
+
+                                    # Rei está na mesma coluna que ameaçante?
                                     elif self.posicao[1] == self.ameacantes[i].posicao[1]:
                                         if(self.posicao[0] > self.ameacantes[i].posicao[0]) and (self.posicao[0] < 7):
                                             casas_ameacadas.append(tabuleiro[self.posicao[0] + 1][self.posicao[1]])
                                         elif (self.posicao[0] < self.ameacantes[i].posicao[0]) and (self.posicao[0] > 0):
                                             casas_ameacadas.append(tabuleiro[self.posicao[0] - 1][self.posicao[1]])
+
+                                    # Então, ameaçante está na diagonal do Rei.
                                     else: 
                                         # Verifica ameaçante no casa superior direita
                                         if((self.posicao[0] > self.ameacantes[i].posicao[0]) and
-                                            (self.posicao[1] < self.ameacantes[i].posicao[1])):
-                                            #Verifica casa no canto inferior esquerdo
+                                                (self.posicao[1] < self.ameacantes[i].posicao[1])):
+                                            # Verifica casa no canto inferior esquerdo
                                             if (self.posicao[0] < 7) and (self.posicao[1] > 0):
                                                 casas_ameacadas.append(tabuleiro[self.posicao[0] + 1][self.posicao[1] - 1])
                                         # Verifica ameaçante no casa inferior direita

@@ -103,6 +103,12 @@ class Peao(PecaBase):
         return casas_possiveis
 
     def get_casas_de_captura(self, tabuleiro: list[list[Casa]]) -> list[Casa]:
+        """
+        Retorna as casas nas quais um Peão pode fazer uma captura.
+        Função principalmente usada para um Rei conhecer as casas ameaçadas por um Peão.
+        :param tabuleiro:
+        :return:
+        """
         casas_de_captura: list[Casa] = []
         i: int = self.posicao[0]
         j: int = self.posicao[1]

@@ -93,6 +93,11 @@ class Casa(pygame.sprite.Sprite):
         self.peca.posicao[1] = self.posicao_na_matriz[1]
 
     def remover_peca(self, com_sprite: bool = False):
+        """
+        Remove a peça da casa colocando o atributo 'peca' como None.
+        :param com_sprite: Default False. Passar True se o sprite deverá ser deletado também.
+        :return:
+        """
         if self.peca is not None and com_sprite:
             self.peca.kill()
         self.peca = None
