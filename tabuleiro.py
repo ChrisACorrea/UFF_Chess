@@ -195,8 +195,7 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         self.promocao()
         self.trocar_vez()
-        self.verifica_xeque()
-        self.houve_xeque_mate()
+
 
     def trocar_vez(self):
         """
@@ -206,10 +205,20 @@ class Tabuleiro(pygame.sprite.Sprite):
         """
         if self.vez == 'claro':
             self.vez = 'escuro'
-            self.mostrar_vez(jogadorTwo)
+            self.verifica_xeque()
+            status = self.houve_xeque_mate()
+            if status == True:
+                self.mostrar_msg_xeque_mate(jogadorOne)
+            else:
+                self.mostrar_vez(jogadorTwo)
         elif self.vez == 'escuro':
             self.vez = 'claro'
-            self.mostrar_vez(jogadorOne)
+            self.verifica_xeque()
+            status = self.houve_xeque_mate()
+            if status == True:
+                self.mostrar_msg_xeque_mate(jogadorTwo)
+            else:
+                self.mostrar_vez(jogadorOne)
 
     def mostrar_vez(self, jogador):
         """
@@ -227,9 +236,9 @@ class Tabuleiro(pygame.sprite.Sprite):
         fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
         fontesys = pygame.font.SysFont(fonte, 50)  ##### usa a fonte padrão
         txttela = fontesys.render(txt, 1, (255, 255, 255))  ##### renderiza o texto na cor desejada
-        self.display.blit(txttela, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
+        self.display.blit(txttela, (480, 15))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
-        time.sleep(2)
+        time.sleep(1)
 
     def promocao(self):
         """
@@ -675,19 +684,29 @@ class Tabuleiro(pygame.sprite.Sprite):
                         todas_casas_possiveis.extend(casas_possiveis_peca)
 
         if len(todas_casas_possiveis) == 0 and self.get_rei_da_vez().is_xeque():
-            self.mostrar_msg_xeque_mate()
-            print("XEQUE MATE SEU OTÁRIO")
 
-    def mostrar_msg_xeque_mate(self):
+            print("XEQUE-MATE!")
+            return True
+        return False
+
+    def mostrar_msg_xeque_mate(self, jogador):
         """
         Quando chamado. Imprime na tela a mensagem 'Xeque-mate'
         :return:
         """
-        txt = 'XEQUE-MATE'  ##### armazena o texto
+        txt = 'Vitória do jogador ' + jogador + '!!!'  ##### armazena o texto
         pygame.font.init()  ##### inicia font
         fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
-        fontesys = pygame.font.SysFont(fonte, 200)  ##### usa a fonte padrão
-        txttela = fontesys.render(txt, 1, (255, 255, 255), (0, 0, 0))  ##### renderiza o texto na cor desejada
-        self.display.blit(txttela, ((self.display.get_width() / 2) - (txttela.get_width() / 2), (self.display.get_height() / 2) - (txttela.get_height() / 2)))  ##### coloca na posição 50,900 (tela FHD)
+        fontesys = pygame.font.SysFont(fonte, 120)  ##### usa a fonte padrão
+        txttela = fontesys.render(txt, 1,  (119, 221, 119))  ##### renderiza o texto na cor desejada
+        self.display.blit(txttela, (150, 280))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
-        time.sleep(2)
+        txt2 = 'XEQUE-MATE'  ##### armazena o texto
+        pygame.font.init()  ##### inicia font
+        fonte2 = pygame.font.get_default_font()  ##### carrega com a fonte padrão
+        fontesys2 = pygame.font.SysFont(fonte2, 50)  ##### usa a fonte padrão
+        txttela2 = fontesys2.render(txt2, 1, (255, 255, 255)) ##### renderiza o texto na cor desejada
+        self.display.blit(txttela2, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
+        pygame.display.update()
+        time.sleep(7)
+        exit()
