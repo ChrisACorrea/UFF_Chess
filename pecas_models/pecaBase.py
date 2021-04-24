@@ -17,6 +17,7 @@ class PecaBase(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
         self.__tonalidade: str = tom
         self.__posicao: tuple[int, int] = posicao
         self.__movimentos: int = 0
+        self.__valor: int = 0
 
         self.rect = pygame.rect.Rect(rect_base.x, rect_base.y, rect_base.width / 1.6, rect_base.height / 1.3)
         self.rect.center = rect_base.center
@@ -60,6 +61,14 @@ class PecaBase(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
     @movimentos.setter
     def movimentos(self, movimentos):
         self.__movimentos = movimentos
+
+    @property
+    def valor (self):
+        return self.__valor
+
+    @valor.setter
+    def valor (self, valor):
+        self.__valor = valor
 
     @abc.abstractmethod
     def get_casas_possiveis(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas: bool = False) -> list[Casa]:

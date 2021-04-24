@@ -15,8 +15,10 @@ class Peao(PecaBase):
 
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.PEAO_PRETO
+            self.valor = -1
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.PEAO_BRANCO
+            self.valor = 1
 
         self.carregar_imagem(self.rect.copy())
 

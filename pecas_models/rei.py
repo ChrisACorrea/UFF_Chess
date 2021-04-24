@@ -15,8 +15,10 @@ class Rei(PecaBase):
         self.conta_xeque: int = 0
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.REI_PRETO
+            self.valor = -99999
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.REI_BRANCO
+            self.valor = 99999
 
         self.ameacantes: list[PecaBase] = []
 

@@ -15,8 +15,10 @@ class Cavalo(PecaBase):
 
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.CAVALO_PRETO
+            self.valor = -3
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.CAVALO_BRANCO
+            self.valor = 3
 
         self.carregar_imagem(self.rect.copy())
 
