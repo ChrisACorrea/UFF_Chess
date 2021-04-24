@@ -167,6 +167,7 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.trocar_vez()
         self.verifica_xeque()
         self.houve_xeque_mate()
+        self.calcular_placar()
 
     def trocar_vez(self):
         if self.vez == 'claro':
@@ -542,3 +543,12 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.display.blit(txttela, ((self.display.get_width() / 2) - (txttela.get_width() / 2), (self.display.get_height() / 2) - (txttela.get_height() / 2)))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
         time.sleep(10)
+
+    def calcular_placar(self):
+        placar = 0
+        for i in range(8):
+            for j in range(8):
+                if self.vetor_de_Controle[i][j].peca is not None:
+                    peca = self.vetor_de_Controle[i][j].peca
+                    placar +=  peca.valor
+        print("PLACAR: ", placar)
