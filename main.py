@@ -12,9 +12,7 @@ display = pygame.display.set_mode([1280, 720])
 modoJogo = 1
 
 def modo_de_jogo(value, difficulty):
-    print(value)
     tipo, valor = value
-    print(tipo)
     modo, valor = tipo
     global modoJogo
     modoJogo = valor

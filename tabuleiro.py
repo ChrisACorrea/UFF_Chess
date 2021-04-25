@@ -11,6 +11,7 @@ from pecas_models.rainha import Rainha
 from pecas_models.rei import Rei
 from pecas_models.torre import Torre
 import random
+import pygame_menu
 
 class Tabuleiro(pygame.sprite.Sprite):
 
@@ -700,18 +701,30 @@ class Tabuleiro(pygame.sprite.Sprite):
                         todas_casas_possiveis.extend(casas_possiveis_peca)
 
         if len(todas_casas_possiveis) == 0 and self.get_rei_da_vez().is_xeque():
-
             print("XEQUE-MATE!")
-            
 
             return True
         return False
+
+    def fim_jogo(self):
+        #display = pygame.display.set_mode([200, 200])
+
+        menu = pygame_menu.Menu(200, 400, 'Fim de jogo',
+                       theme=pygame_menu.themes.THEME_DARK)
+        menu.add.button('Sair', pygame_menu.events.EXIT)
+        menu.mainloop(pygame.display.get_surface())
+
+        pygame.display.update()
 
     def mostrar_msg_xeque_mate(self, jogador):
         """
         Quando chamado. Imprime na tela a mensagem 'Xeque-mate'
         :return:
         """
+        self.limpar_selecoes()
+        self.desenhar_tabuleiro()
+        pygame.display.update()
+        time.sleep(0.5)
         txt = 'Vitória do jogador ' + jogador + '!!!'  ##### armazena o texto
         pygame.font.init()  ##### inicia font
         fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
@@ -727,7 +740,8 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.display.blit(txttela2, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
         time.sleep(7)
-        exit()
+        
+        self.fim_jogo()
 
     def calcular_placar(self):
         placar = 0
