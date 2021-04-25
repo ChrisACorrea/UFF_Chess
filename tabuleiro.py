@@ -8,7 +8,7 @@ from pecas_models.peao import Peao
 from pecas_models.rainha import Rainha
 from pecas_models.rei import Rei
 from pecas_models.torre import Torre
-
+import random
 
 class Tabuleiro(pygame.sprite.Sprite):
 
@@ -72,10 +72,16 @@ class Tabuleiro(pygame.sprite.Sprite):
         j: int = int((posicao_mouse[0] - ((self.display.get_width() - (tamanho * 8)) / 2)) / tamanho)
         return [i, j]
 
-    def selecionar_casa(self, posicao_mouse: tuple[int, int]):
-        posicao_casa = self.calcular_casa(posicao_mouse)
-        i: int = posicao_casa[0]
-        j: int = posicao_casa[1]
+    def selecionar_casa(self, posicao_mouse: tuple[int, int], posicao_ia: tuple = None):
+
+        if(posicao_ia is None):
+            posicao_casa = self.calcular_casa(posicao_mouse)
+            i: int = posicao_casa[0]
+            j: int = posicao_casa[1]
+        else:
+            i: int = posicao_ia[0]
+            j: int = posicao_ia[1]
+
         print('Clicou em', self.vetor_de_Controle[i][j].posicao, self.vetor_de_Controle[i][j].posicao_na_matriz)
 
         if self.vetor_de_Controle[i][j].possivel:
@@ -167,7 +173,8 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.trocar_vez()
         self.verifica_xeque()
         self.houve_xeque_mate()
-        self.calcular_placar()
+        # IA:
+        self.melhor_movimento()
 
     def trocar_vez(self):
         if self.vez == 'claro':
@@ -551,4 +558,82 @@ class Tabuleiro(pygame.sprite.Sprite):
                 if self.vetor_de_Controle[i][j].peca is not None:
                     peca = self.vetor_de_Controle[i][j].peca
                     placar +=  peca.valor
-        print("PLACAR: ", placar)
+        print("PLACAR:", placar)
+
+    def melhor_movimento(self):
+        if self.vez == "claro":
+            return
+        placar = self.calcular_placar()
+        maior = 0
+        casa_destino = None
+        casa_origem = None
+        jogadas_aleatorias_possiveis = []
+        vetor_de_controle_inicial = self.vetor_de_Controle
+
+        # e
+
+        # selecionar jogada que captura a melhor peça, se houver, ou adicionar as jogadas possíveis a um vetor
+        for i in range(8):
+            for j in range(8):
+                if self.vetor_de_Controle[i][j].peca is not None:
+                    peca = self.vetor_de_Controle[i][j].peca
+                    if peca.tonalidade == self.vez:
+                        for casa in peca.get_casas_possiveis(self.vetor_de_Controle):
+                            # tentando selecionar jogada que captura a melhor peça, se houver
+                            if casa.peca is not None and casa.peca.tonalidade == "claro":
+                                if (casa.peca.valor >= maior):
+                                    maior = casa.peca.valor
+                                    casa_destino = casa
+                                    casa_origem = self.vetor_de_Controle[i][j]
+                        if peca is not None and len(peca.get_casas_possiveis(self.vetor_de_Controle)) > 0:
+                            # ATENÇÃO: verificar se ele está sabendo quem é a peça que está sendo movida
+                            jogadas_aleatorias_possiveis.append(self.vetor_de_Controle[i][j])
+
+
+        if casa_destino is None:
+            tam_origem = len(jogadas_aleatorias_possiveis)
+            index = random.randrange(0, tam_origem, 1)
+            casa_origem = jogadas_aleatorias_possiveis[index]
+            casa_origem.marcar_como_selecionado()
+
+            tam_destino = len(casa_origem.peca.get_casas_possiveis(self.vetor_de_Controle))
+            index_destino = random.randrange(0, tam_destino, 1)
+            casa_destino = casa_origem.peca.get_casas_possiveis(self.vetor_de_Controle)[index_destino]
+            casa_destino.marcar_como_possivel()
+            self.casa_selecionada = casa_origem
+            self.selecionar_casa(casa_destino, casa_destino.posicao_na_matriz)
+            # casa_destino.desmarcar_como_selecionado()
+            self.limpar_selecoes()
+
+        else:
+            casa_destino.marcar_como_possivel()
+            self.casa_selecionada = casa_origem
+            self.selecionar_casa(casa_destino, casa_destino.posicao_na_matriz)
+            # casa_destino.desmarcar_como_selecionado()
+            # self.mover_peca(casa_destino)
+            self.limpar_selecoes()
+
+
+
+    # IA versus IA
+    # def melhor_movimento(self):
+    #     placar = self.calcular_placar()
+    #     posicao = None
+    #     vetor_de_controle_inicial = self.vetor_de_Controle
+    #     for i in range(8):
+    #         for j in range(8):
+    #             if self.vetor_de_Controle[i][j].peca is not None:
+    #                 peca = self.vetor_de_Controle[i][j].peca
+    #                 if peca.tonalidade == self.vez:
+    #                     #(APAGAR) ideia: usar um vetor de controle falso
+    #                     for casa in peca.get_casas_possiveis(self.vetor_de_Controle):
+    #                         self.selecionar_casa(casa, [i,j])
+    #                         self.mover_peca(casa)
+    #                         # self.vetor_de_Controle = vetor_de_controle_inicial
+    #
+    #                     placar_temp = self.calcular_placar()
+    #                     # para as claras o placar deve ser o maior possível
+    #                     if placar_temp is not None and placar is not None and placar_temp > placar:
+    #                         placar = placar_temp
+    #                         #por enquanto salvando apenas a posicao da peça
+    #                         posicao = peca.posicao
