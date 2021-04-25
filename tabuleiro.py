@@ -24,6 +24,9 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.altura_tela = display.get_height()
         self.objectGroup = pygame.sprite.Group()
 
+        #self.jogadorVsIA = False
+        self.jogadorVsIA = True
+
         # variável que guarda a referência dos dois reis para consultas rápidas
         # branco no indice [0] e preto no indice [1]
         self.reis: tuple[Rei, Rei] = [None, None]
@@ -202,7 +205,8 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.promocao()
         self.trocar_vez()
         # IA:
-        self.melhor_movimento()
+        if self.jogadorVsIA:
+            self.melhor_movimento()
 
 
     def trocar_vez(self):
@@ -769,6 +773,7 @@ class Tabuleiro(pygame.sprite.Sprite):
             casa_destino = casa_origem.peca.get_casas_possiveis(self.vetor_de_Controle)[index_destino]
             casa_destino.marcar_como_possivel()
             self.casa_selecionada = casa_origem
+            self.casas_possiveis = self.casa_selecionada.peca.get_casas_possiveis(self.vetor_de_Controle)
             self.selecionar_casa(casa_destino, casa_destino.posicao_na_matriz)
             # casa_destino.desmarcar_como_selecionado()
             self.limpar_selecoes()
@@ -776,6 +781,7 @@ class Tabuleiro(pygame.sprite.Sprite):
         else:
             casa_destino.marcar_como_possivel()
             self.casa_selecionada = casa_origem
+            self.casas_possiveis = self.casa_selecionada.peca.get_casas_possiveis(self.vetor_de_Controle)
             self.selecionar_casa(casa_destino, casa_destino.posicao_na_matriz)
             # casa_destino.desmarcar_como_selecionado()
             # self.mover_peca(casa_destino)
