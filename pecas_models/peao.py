@@ -15,8 +15,10 @@ class Peao(PecaBase):
 
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.PEAO_PRETO
+            self.valor = -1
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.PEAO_BRANCO
+            self.valor = 1
 
         self.carregar_imagem(self.rect.copy())
 
@@ -103,6 +105,12 @@ class Peao(PecaBase):
         return casas_possiveis
 
     def get_casas_de_captura(self, tabuleiro: list[list[Casa]]) -> list[Casa]:
+        """
+        Retorna as casas nas quais um Peão pode fazer uma captura.
+        Função principalmente usada para um Rei conhecer as casas ameaçadas por um Peão.
+        :param tabuleiro:
+        :return:
+        """
         casas_de_captura: list[Casa] = []
         i: int = self.posicao[0]
         j: int = self.posicao[1]

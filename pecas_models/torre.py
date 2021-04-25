@@ -15,8 +15,10 @@ class Torre(PecaBase):
 
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.TORRE_PRETO
+            self.valor = -5
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.TORRE_BRANCO
+            self.valor = 5
 
         self.carregar_imagem(self.rect.copy())
 
