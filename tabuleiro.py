@@ -1,6 +1,8 @@
 import pygame
 from pygame.sprite import Group, AbstractGroup
 import time
+
+from ia import IA
 from casa import Casa
 from pecas_models.bispo import Bispo
 from pecas_models.pecaBase import PecaBase
@@ -208,7 +210,7 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         # IA:
         if modoJogo == 2:
-            self.melhor_movimento()
+            IA(self)
 
 
     def trocar_vez(self):
