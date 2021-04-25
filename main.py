@@ -10,7 +10,13 @@ pygame.init()
 display = pygame.display.set_mode([1280, 720])
 
 def modo_de_jogo(value, difficulty):
+    '''
+    tipo, valor = value
+    modoJogo, valor = tipo
+    if valor == 2: 
+        tabuleiro.jogadorVsIA = True
     # Do the job here !
+    '''
     pass
 
 menu = pygame_menu.Menu(720, 1280, 'Bem vindo ao UFF_Chess',
