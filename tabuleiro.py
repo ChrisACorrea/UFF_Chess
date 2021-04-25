@@ -1,6 +1,8 @@
 import pygame
 from pygame.sprite import Group, AbstractGroup
 import time
+
+from ia import IA
 from casa import Casa
 from pecas_models.bispo import Bispo
 from pecas_models.pecaBase import PecaBase
@@ -8,11 +10,12 @@ from pecas_models.peao import Peao
 from pecas_models.rainha import Rainha
 from pecas_models.rei import Rei
 from pecas_models.torre import Torre
-
+import random
+import pygame_menu
 
 class Tabuleiro(pygame.sprite.Sprite):
 
-    def __init__(self, display: pygame.Surface, *groups: AbstractGroup, jogador1, jogador2):
+    def __init__(self, display: pygame.Surface, *groups: AbstractGroup, jogador1, jogador2, modo_de_jogo):
         super().__init__(*groups)
         self.display: pygame.Surface
         self.objectGroup: Group
@@ -30,10 +33,14 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         self.iniciar_tabuleiro()
 
+        global modoJogo
+        modoJogo = modo_de_jogo
+
         global jogadorOne
         jogadorOne = jogador1
         global jogadorTwo
         jogadorTwo = jogador2
+        
 
     def iniciar_tabuleiro(self):
         """
@@ -86,10 +93,16 @@ class Tabuleiro(pygame.sprite.Sprite):
         j: int = int((posicao_mouse[0] - ((self.display.get_width() - (tamanho * 8)) / 2)) / tamanho)
         return [i, j]
 
-    def selecionar_casa(self, posicao_mouse: tuple[int, int]):
-        posicao_casa = self.calcular_casa(posicao_mouse)
-        i: int = posicao_casa[0]
-        j: int = posicao_casa[1]
+    def selecionar_casa(self, posicao_mouse: tuple[int, int], posicao_ia: tuple = None):
+
+        if(posicao_ia is None):
+            posicao_casa = self.calcular_casa(posicao_mouse)
+            i: int = posicao_casa[0]
+            j: int = posicao_casa[1]
+        else:
+            i: int = posicao_ia[0]
+            j: int = posicao_ia[1]
+
         print('Clicou em', self.vetor_de_Controle[i][j].posicao, self.vetor_de_Controle[i][j].posicao_na_matriz)
 
         if self.vetor_de_Controle[i][j].possivel:
@@ -195,8 +208,11 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         self.promocao()
         self.trocar_vez()
-        self.verifica_xeque()
-        self.houve_xeque_mate()
+
+        # IA:
+        if modoJogo == 2:
+            IA(self)
+
 
     def trocar_vez(self):
         """
@@ -206,10 +222,20 @@ class Tabuleiro(pygame.sprite.Sprite):
         """
         if self.vez == 'claro':
             self.vez = 'escuro'
-            self.mostrar_vez(jogadorTwo)
+            self.verifica_xeque()
+            status = self.houve_xeque_mate()
+            if status == True:
+                self.mostrar_msg_xeque_mate(jogadorOne)
+            else:
+                self.mostrar_vez(jogadorTwo)
         elif self.vez == 'escuro':
             self.vez = 'claro'
-            self.mostrar_vez(jogadorOne)
+            self.verifica_xeque()
+            status = self.houve_xeque_mate()
+            if status == True:
+                self.mostrar_msg_xeque_mate(jogadorTwo)
+            else:
+                self.mostrar_vez(jogadorOne)
 
     def mostrar_vez(self, jogador):
         """
@@ -227,9 +253,9 @@ class Tabuleiro(pygame.sprite.Sprite):
         fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
         fontesys = pygame.font.SysFont(fonte, 50)  ##### usa a fonte padrão
         txttela = fontesys.render(txt, 1, (255, 255, 255))  ##### renderiza o texto na cor desejada
-        self.display.blit(txttela, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
+        self.display.blit(txttela, (480, 15))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
-        time.sleep(2)
+        time.sleep(1)
 
     def promocao(self):
         """
@@ -675,19 +701,53 @@ class Tabuleiro(pygame.sprite.Sprite):
                         todas_casas_possiveis.extend(casas_possiveis_peca)
 
         if len(todas_casas_possiveis) == 0 and self.get_rei_da_vez().is_xeque():
-            self.mostrar_msg_xeque_mate()
-            print("XEQUE MATE SEU OTÁRIO")
+            print("XEQUE-MATE!")
 
-    def mostrar_msg_xeque_mate(self):
+            return True
+        return False
+
+    def fim_jogo(self):
+        #display = pygame.display.set_mode([200, 200])
+
+        menu = pygame_menu.Menu(200, 400, 'Fim de jogo',
+                       theme=pygame_menu.themes.THEME_DARK)
+        menu.add.button('Sair', pygame_menu.events.EXIT)
+        menu.mainloop(pygame.display.get_surface())
+
+        pygame.display.update()
+
+    def mostrar_msg_xeque_mate(self, jogador):
         """
         Quando chamado. Imprime na tela a mensagem 'Xeque-mate'
         :return:
         """
-        txt = 'XEQUE-MATE'  ##### armazena o texto
+        self.limpar_selecoes()
+        self.desenhar_tabuleiro()
+        pygame.display.update()
+        time.sleep(0.5)
+        txt = 'Vitória do jogador ' + jogador + '!!!'  ##### armazena o texto
         pygame.font.init()  ##### inicia font
         fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
-        fontesys = pygame.font.SysFont(fonte, 200)  ##### usa a fonte padrão
-        txttela = fontesys.render(txt, 1, (255, 255, 255), (0, 0, 0))  ##### renderiza o texto na cor desejada
-        self.display.blit(txttela, ((self.display.get_width() / 2) - (txttela.get_width() / 2), (self.display.get_height() / 2) - (txttela.get_height() / 2)))  ##### coloca na posição 50,900 (tela FHD)
+        fontesys = pygame.font.SysFont(fonte, 120)  ##### usa a fonte padrão
+        txttela = fontesys.render(txt, 1,  (119, 221, 119))  ##### renderiza o texto na cor desejada
+        self.display.blit(txttela, (150, 280))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
-        time.sleep(2)
+        txt2 = 'XEQUE-MATE'  ##### armazena o texto
+        pygame.font.init()  ##### inicia font
+        fonte2 = pygame.font.get_default_font()  ##### carrega com a fonte padrão
+        fontesys2 = pygame.font.SysFont(fonte2, 50)  ##### usa a fonte padrão
+        txttela2 = fontesys2.render(txt2, 1, (255, 255, 255)) ##### renderiza o texto na cor desejada
+        self.display.blit(txttela2, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
+        pygame.display.update()
+        time.sleep(7)
+        
+        self.fim_jogo()
+
+    def calcular_placar(self):
+        placar = 0
+        for i in range(8):
+            for j in range(8):
+                if self.vetor_de_Controle[i][j].peca is not None:
+                    peca = self.vetor_de_Controle[i][j].peca
+                    placar +=  peca.valor
+        print("PLACAR:", placar)
