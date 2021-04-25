@@ -36,6 +36,10 @@ class Tabuleiro(pygame.sprite.Sprite):
         jogadorTwo = jogador2
 
     def iniciar_tabuleiro(self):
+        """
+        Preenche a matriz de controle (vetor_de_controle) com as casas instanciando uma casa para cada posição.
+        :return:
+        """
         for i in range(0, 8, 1):
             self.vetor_de_Controle.append([])
             for j in range(0, 8, 1):
@@ -61,12 +65,22 @@ class Tabuleiro(pygame.sprite.Sprite):
         return
 
     def clicou_dentro_do_tabuleiro(self, posicao_mouse: tuple[int, int]) -> bool:
+        """
+        Verifica se o clique do mouse aconteceu dentro do tabuleiro.
+        :param posicao_mouse:
+        :return: True, se clique ocorreu dentro do tabuleiro, senão False
+        """
         if ((self.vetor_de_Controle[0][0].rect.left < posicao_mouse[0] < self.vetor_de_Controle[7][7].rect.right) and
                 (self.vetor_de_Controle[0][0].rect.top < posicao_mouse[1] < self.vetor_de_Controle[7][7].rect.bottom)):
             return True
         return False
 
-    def calcular_casa(self, posicao_mouse: tuple[int, int]):
+    def calcular_casa(self, posicao_mouse: tuple[int, int]) -> tuple[int, int]:
+        """
+        Calcula em qual casa o clique aconteceu baseado na posição do mouse.
+        :param posicao_mouse:
+        :return: Os índices ([linha, coluna]) correspondentes a casa clicada.
+        """
         tamanho: int = int(self.display.get_height() / 10)
         i: int = int((posicao_mouse[1] - tamanho) / tamanho)
         j: int = int((posicao_mouse[0] - ((self.display.get_width() - (tamanho * 8)) / 2)) / tamanho)
@@ -102,6 +116,11 @@ class Tabuleiro(pygame.sprite.Sprite):
             self.limpar_selecoes()
 
     def marcar_casas_possiveis(self):
+        """
+        Marca no tabuleiro as jogadas possível da atual peça selecionada.
+
+        :return:
+        """
         posicao_casa_selecionada = self.casa_selecionada.posicao_na_matriz
         i: int = posicao_casa_selecionada[0]
         j: int = posicao_casa_selecionada[1]
@@ -109,19 +128,24 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.casas_possiveis = self.vetor_de_Controle[i][j].peca.get_casas_possiveis(self.vetor_de_Controle)
 
         # Não permite que uma peça saia do lugar e deixe seu rei em xeque
-        casas_xeque_tratadas = self.tratar_possivel_xeque(self.vetor_de_Controle[i][j].peca, self.casas_possiveis)
+        casas_xeque_tratadas = self.tratar_xeque_em_potencial(self.vetor_de_Controle[i][j].peca, self.casas_possiveis)
         if casas_xeque_tratadas is not None:
             self.casas_possiveis.clear()
             self.casas_possiveis.extend(casas_xeque_tratadas)
 
         if self.rei_em_xeque() and type(self.vetor_de_Controle[i][j].peca) != Rei:
             # Deixa como casas possíveis somente aquelas entre o rei e o ameaçante (incluindo o ameaçante)
-            self.casas_possiveis = self.tratar_casas_possiveis(self.casas_possiveis)
+            self.casas_possiveis = self.get_casas_que_salvam_o_rei(self.casas_possiveis)
 
         for i in range(0, len(self.casas_possiveis), 1):
             self.casas_possiveis[i].marcar_como_possivel()
 
     def limpar_selecoes(self):
+        """
+        Limpa todas as marcações feitas no tabuleiro.
+
+        :return:
+        """
         if self.casa_selecionada:
             self.casa_selecionada.desmarcar_como_selecionado()
 
@@ -135,6 +159,12 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.casas_possiveis.clear()
 
     def mover_peca(self, casa_destino: Casa):
+        """
+        Move a atual peça selecionada para a casa escolhida. Considera jogadas especiais.
+
+        :param casa_destino: Casa que foi escolhida para a peça ser movida.
+        :return:
+        """
         peca_movida: PecaBase = self.casa_selecionada.peca
         peca_movida.movimentos += 1
         self.casa_selecionada.remover_peca()
@@ -171,22 +201,42 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         self.promocao()
         self.trocar_vez()
-        self.verifica_xeque()
-        self.houve_xeque_mate()
         # IA:
         self.melhor_movimento()
 
+
     def trocar_vez(self):
+        """
+        Troca a vez do jogador.
+
+        :return:
+        """
         if self.vez == 'claro':
             self.vez = 'escuro'
-            self.mostrar_vez(jogadorTwo)
+            self.verifica_xeque()
+            status = self.houve_xeque_mate()
+            if status == True:
+                self.mostrar_msg_xeque_mate(jogadorOne)
+            else:
+                self.mostrar_vez(jogadorTwo)
         elif self.vez == 'escuro':
             self.vez = 'claro'
-            self.mostrar_vez(jogadorOne)
+            self.verifica_xeque()
+            status = self.houve_xeque_mate()
+            if status == True:
+                self.mostrar_msg_xeque_mate(jogadorTwo)
+            else:
+                self.mostrar_vez(jogadorOne)
 
     def mostrar_vez(self, jogador):
-        self.limpar_selecoes();
-        self.desenhar_tabuleiro();
+        """
+        Imprime na tela de qual jogador é a vez.
+
+        :param jogador:
+        :return:
+        """
+        self.limpar_selecoes()
+        self.desenhar_tabuleiro()
         pygame.display.update()
         time.sleep(0.5)
         txt = 'Vez do jogador ' + jogador  ##### armazena o texto
@@ -194,11 +244,16 @@ class Tabuleiro(pygame.sprite.Sprite):
         fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
         fontesys = pygame.font.SysFont(fonte, 50)  ##### usa a fonte padrão
         txttela = fontesys.render(txt, 1, (255, 255, 255))  ##### renderiza o texto na cor desejada
-        self.display.blit(txttela, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
+        self.display.blit(txttela, (480, 15))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
-        time.sleep(2)
+        time.sleep(1)
 
     def promocao(self):
+        """
+        Verifica se um Peão chegou ao fim do tabuleiro e o promove.
+
+        :return:
+        """
         for i in range(0, 8):
             if type(self.vetor_de_Controle[0][i].peca) == Peao:
                 casa: Casa = self.vetor_de_Controle[0][i]
@@ -212,6 +267,10 @@ class Tabuleiro(pygame.sprite.Sprite):
                 self.vetor_de_Controle[7][i].inserir_peca(rainha)
 
     def verifica_xeque(self):
+        """
+        Varre o tabuleiro e verifica se alguma peça ameaça o Rei, se sim, esta peça é adicionada à lista de ameaçantes
+        do Rei ameaçado.
+        """
         self.get_rei_da_vez().limpar_ameacantes()
 
         for i in range(0, 8):
@@ -225,41 +284,75 @@ class Tabuleiro(pygame.sprite.Sprite):
                                 casa_possiveis[k].peca.add_ameacante(casa.peca)
 
     def get_rei_da_vez(self) -> Rei:
+        """
+        Retorna o Rei do jogador atual.
+        """
         return self.reis[0] if self.vez == 'claro' else self.reis[1]
 
     def rei_em_xeque(self) -> bool:
+        """
+        Verifica se o Rei do atual jogador está em cheque.
+
+        :return: True se o Rei está em xeque, senão False.
+        """
         return self.get_rei_da_vez().is_xeque()
 
-    def tratar_casas_possiveis(self, casas_possiveis: list[Casa]):
+    def get_casas_que_salvam_o_rei(self, casas_possiveis: list[Casa]):
+        """
+        ATENÇÃO: Está função NÃO deve ser utilizada se Rei NÃO estiver em xeque. E NÃO deve ser utilizada se a peça
+        selecionada for um Rei.
+
+        Trata as casas possíveis passadas e deixa somente as casas cuja as jogadas salvam o Rei.
+
+        :param casas_possiveis: Lista de casas possíveis de uma peça.
+        :return: Lista de casas com potencial de salvar o Rei.
+        """
         rei_da_vez: Rei = self.get_rei_da_vez()
         posicao_rei = rei_da_vez.posicao
         ameacantes: list[PecaBase] = rei_da_vez.ameacantes
+
+        # Em casa_de_salvamento são incluídas todas as casas que estão entre o Rei ameaçado e o ameaçante desse Rei.
         casas_de_salvamento: list[Casa] = []
+
+        # casas_de_defesa guarda todas as casas de salvamento que também estão em casas_possíveis.
         casas_de_defesa: list[Casa] = []
 
         for i in range(0, len(ameacantes)):
             posicao_ameacante = ameacantes[i].posicao
             casas_de_salvamento.append(self.vetor_de_Controle[posicao_ameacante[0]][posicao_ameacante[1]])
 
+            # Verifica se estão na mesma linha
             if posicao_rei[0] == posicao_ameacante[0]:
-                step = 1 if posicao_ameacante[1] > posicao_rei[1] else -1
+                # verifica se o ameaçante está a direita ou a esquerda
+                step = 1 if posicao_ameacante[1] > posicao_rei[1] else -1 
+                # Varre as casas entre o rei e ameaçante e salva em casa_de_salvamento
                 for coluna in range(posicao_rei[1] + step, posicao_ameacante[1]):
                     casas_de_salvamento.append(self.vetor_de_Controle[posicao_rei[0]][coluna])
+
+            # Verifica se estão na mesma coluna
             elif posicao_rei[1] == posicao_ameacante[1]:
+                # Verifica se o ameaçante está acima ou abaixo do rei
                 step = 1 if posicao_ameacante[0] > posicao_rei[0] else -1
+                # Varre as casas entre o rei e ameaçante e salva em casa_de_salvamento
                 for linha in range(posicao_rei[0] + step, posicao_ameacante[0]):
                     casas_de_salvamento.append(self.vetor_de_Controle[linha][posicao_rei[1]])
+
+            # Verifica se estão na mesma diagonal
             else:
                 if type(ameacantes[i]) == Bispo or type(ameacantes[i]) == Rainha:
+                    # Verifica em qual diagonal o ameaçante está
                     step_l = 1 if posicao_ameacante[0] > posicao_rei[0] else -1
                     step_c = 1 if posicao_ameacante[1] > posicao_rei[1] else -1
                     linha = posicao_rei[0] + step_l
                     coluna = posicao_rei[1] + step_c
+                    # Varre as casas entre o rei e ameaçante e salva em casa_de_salvamento
                     while posicao_ameacante[0] != linha and posicao_ameacante[1] != coluna:
                         casas_de_salvamento.append(self.vetor_de_Controle[linha][coluna])
                         linha += step_l
                         coluna += step_c
 
+        # Faz o cruzamento entre as casa possíveis e as casas de salvamento.
+        # Caso uma casa esteja nos dois vetores ela é acrescentada no vetor casas_de_defesa.
         for i in range(0, len(casas_possiveis)):
             for j in range(0, len(casas_de_salvamento)):
                 if casas_possiveis[i].posicao == casas_de_salvamento[j].posicao:
@@ -267,7 +360,15 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         return casas_de_defesa
 
-    def tratar_possivel_xeque(self, peca_selecionada: PecaBase, casas_possiveis: list[Casa]):
+    def tratar_xeque_em_potencial(self, peca_selecionada: PecaBase, casas_possiveis: list[Casa]):
+        """
+        Se a peça selecionada está entre o seu Rei e um possível ameaçante a lista de casas possíveis recebida
+        é tratada e é retornada uma nova lista de casas possível na qual os movimentos não deixarão o seu Rei em perigo.
+        Se a peça selecionada NÃO se encontra na condição relatada, é retornado o valor None.
+
+        :param peca_selecionada: Peça que foi selecionada pelo jogador.
+        :param casas_possiveis: Lista que será tratada.
+        """
         posicao_peca = peca_selecionada.posicao
         caminho_da_salvacao: list[Casa] = []
         caminho_da_morte = self.get_caminho_da_morte(posicao_peca)
@@ -283,6 +384,10 @@ class Tabuleiro(pygame.sprite.Sprite):
         return None
 
     def get_casas_superior(self, posicao_atual: tuple[int, int]):
+        """
+        A partir da posição passada pega todas as casas acima até encontrar uma peça ou até terminar o tabuleiro.
+        :param posicao_atual: Coordenada do tabuleiro que será usada como base.
+        """
         casas_encontradas: list[Casa] = []
         i = posicao_atual[0]
         j = posicao_atual[1]
@@ -298,6 +403,10 @@ class Tabuleiro(pygame.sprite.Sprite):
         return casas_encontradas
 
     def get_casas_inferior(self, posicao_atual: tuple[int, int]):
+        """
+        A partir da posição passada pega todas as casas abaixo até encontrar uma peça ou até terminar o tabuleiro.
+        :param posicao_atual: Coordenada do tabuleiro que será usada como base.
+        """
         casas_encontradas: list[Casa] = []
         i = posicao_atual[0]
         j = posicao_atual[1]
@@ -313,6 +422,10 @@ class Tabuleiro(pygame.sprite.Sprite):
         return casas_encontradas
 
     def get_casas_direita(self, posicao_atual: tuple[int, int]):
+        """
+        A partir da posição passada pega todas as casas a direita até encontrar uma peça ou até terminar o tabuleiro.
+        :param posicao_atual: Coordenada do tabuleiro que será usada como base.
+        """
         casas_encontradas: list[Casa] = []
         i = posicao_atual[0]
         j = posicao_atual[1]
@@ -328,6 +441,10 @@ class Tabuleiro(pygame.sprite.Sprite):
         return casas_encontradas
 
     def get_casas_esquerda(self, posicao_atual: tuple[int, int]):
+        """
+        A partir da posição passada pega todas as casas a esquerda até encontrar uma peça ou até terminar o tabuleiro.
+        :param posicao_atual: Coordenada do tabuleiro que será usada como base.
+        """
         casas_encontradas: list[Casa] = []
         i = posicao_atual[0]
         j = posicao_atual[1]
@@ -343,6 +460,11 @@ class Tabuleiro(pygame.sprite.Sprite):
         return casas_encontradas
 
     def get_casas_diagonal_superior_direita(self, posicao_atual: tuple[int, int]):
+        """
+        A partir da posição passada pega todas as casas na direção superior direita até encontrar uma peça
+        ou até terminar o tabuleiro.
+        :param posicao_atual: Coordenada do tabuleiro que será usada como base.
+        """
         casas_encontradas: list[Casa] = []
         i = posicao_atual[0]
         j = posicao_atual[1]
@@ -359,6 +481,11 @@ class Tabuleiro(pygame.sprite.Sprite):
         return casas_encontradas
 
     def get_casas_diagonal_inferior_direita(self, posicao_atual: tuple[int, int]):
+        """
+        A partir da posição passada pega todas as casas na direção inferior direita até encontrar uma peça
+        ou até terminar o tabuleiro.
+        :param posicao_atual: Coordenada do tabuleiro que será usada como base.
+        """
         casas_encontradas: list[Casa] = []
         i = posicao_atual[0]
         j = posicao_atual[1]
@@ -375,6 +502,11 @@ class Tabuleiro(pygame.sprite.Sprite):
         return casas_encontradas
 
     def get_casas_diagonal_inferior_esquerda(self, posicao_atual: tuple[int, int]):
+        """
+        A partir da posição passada pega todas as casas na direção inferior esquerda até encontrar uma peça
+        ou até terminar o tabuleiro.
+        :param posicao_atual: Coordenada do tabuleiro que será usada como base.
+        """
         casas_encontradas: list[Casa] = []
         i = posicao_atual[0]
         j = posicao_atual[1]
@@ -391,6 +523,11 @@ class Tabuleiro(pygame.sprite.Sprite):
         return casas_encontradas
 
     def get_casas_diagonal_superior_esquerda(self, posicao_atual: tuple[int, int]):
+        """
+        A partir da posição passada pega todas as casas na direção superior esquerda até encontrar uma peça
+        ou até terminar o tabuleiro.
+        :param posicao_atual: Coordenada do tabuleiro que será usada como base.
+        """
         casas_encontradas: list[Casa] = []
         i = posicao_atual[0]
         j = posicao_atual[1]
@@ -406,7 +543,14 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         return casas_encontradas
 
-    def get_caminho_da_morte(self, posicao_peca):
+    def get_caminho_da_morte(self, posicao_peca: tuple[int, int]) -> list[Casa]:
+        """
+        Verifica se uma peça está entre seu Rei e um possível ameaçante.
+        Se estiver, retorna a lista de casas entre o possível ameaçante e o Rei.
+
+        :param posicao_peca: Posição da peça que será verificada
+        :return:
+        """
         caminho_da_morte: list[Casa] = []
 
         direcao_rei = self.get_casas_superior(posicao_peca)
@@ -524,6 +668,11 @@ class Tabuleiro(pygame.sprite.Sprite):
         return caminho_da_morte
 
     def houve_xeque_mate(self):
+        """
+        Verifica se houve xeque-mate.
+        Se houve, mostra na tela a mensagem 'Xeque-Mate'.
+        :return:
+        """
         todas_casas_possiveis: list[Casa] = []
 
         for i in range(8):
@@ -532,24 +681,43 @@ class Tabuleiro(pygame.sprite.Sprite):
                     peca = self.vetor_de_Controle[i][j].peca
                     if peca.tonalidade == self.vez:
                         casas_possiveis_peca = peca.get_casas_possiveis(self.vetor_de_Controle)
-                        casas_possivel_cheque_tratadas = self.tratar_possivel_xeque(peca, casas_possiveis_peca)
+                        casas_possivel_cheque_tratadas = self.tratar_xeque_em_potencial(peca, todas_casas_possiveis)
                         if casas_possivel_cheque_tratadas is not None:
-                            todas_casas_possiveis.extend(casas_possivel_cheque_tratadas)
-                        todas_casas_possiveis = self.tratar_casas_possiveis(todas_casas_possiveis)
+                            casas_possiveis_peca.clear()
+                            casas_possiveis_peca.extend(casas_possivel_cheque_tratadas)
+                        if self.rei_em_xeque() and type(self.vetor_de_Controle[i][j].peca) != Rei:
+                            casas_tratadas = self.get_casas_que_salvam_o_rei(casas_possiveis_peca)
+                            casas_possiveis_peca.clear()
+                            casas_possiveis_peca.extend(casas_tratadas)
+                        todas_casas_possiveis.extend(casas_possiveis_peca)
 
         if len(todas_casas_possiveis) == 0 and self.get_rei_da_vez().is_xeque():
-            self.mostrar_msg_xeque_mate()
-            print("XEQUE MATE SEU OTÁRIO")
 
-    def mostrar_msg_xeque_mate(self):
-        txt = 'XEQUE-MATE'  ##### armazena o texto
+            print("XEQUE-MATE!")
+            return True
+        return False
+
+    def mostrar_msg_xeque_mate(self, jogador):
+        """
+        Quando chamado. Imprime na tela a mensagem 'Xeque-mate'
+        :return:
+        """
+        txt = 'Vitória do jogador ' + jogador + '!!!'  ##### armazena o texto
         pygame.font.init()  ##### inicia font
         fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
-        fontesys = pygame.font.SysFont(fonte, 200)  ##### usa a fonte padrão
-        txttela = fontesys.render(txt, 1, (255, 255, 255), (0, 0, 0))  ##### renderiza o texto na cor desejada
-        self.display.blit(txttela, ((self.display.get_width() / 2) - (txttela.get_width() / 2), (self.display.get_height() / 2) - (txttela.get_height() / 2)))  ##### coloca na posição 50,900 (tela FHD)
+        fontesys = pygame.font.SysFont(fonte, 120)  ##### usa a fonte padrão
+        txttela = fontesys.render(txt, 1,  (119, 221, 119))  ##### renderiza o texto na cor desejada
+        self.display.blit(txttela, (150, 280))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
-        time.sleep(10)
+        txt2 = 'XEQUE-MATE'  ##### armazena o texto
+        pygame.font.init()  ##### inicia font
+        fonte2 = pygame.font.get_default_font()  ##### carrega com a fonte padrão
+        fontesys2 = pygame.font.SysFont(fonte2, 50)  ##### usa a fonte padrão
+        txttela2 = fontesys2.render(txt2, 1, (255, 255, 255)) ##### renderiza o texto na cor desejada
+        self.display.blit(txttela2, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
+        pygame.display.update()
+        time.sleep(7)
+        exit()
 
     def calcular_placar(self):
         placar = 0
@@ -637,3 +805,4 @@ class Tabuleiro(pygame.sprite.Sprite):
     #                         placar = placar_temp
     #                         #por enquanto salvando apenas a posicao da peça
     #                         posicao = peca.posicao
+        

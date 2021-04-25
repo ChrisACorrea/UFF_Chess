@@ -72,6 +72,18 @@ class PecaBase(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_casas_possiveis(self, tabuleiro: list[list[Casa]], incluir_casas_ameacadas: bool = False) -> list[Casa]:
+        """
+        Pega todas as casas nas quais a peça pode ser jogada.
+
+        :param tabuleiro: Matriz de controle que contém o estado do jogo.
+
+        :param incluir_casas_ameacadas: Padrão: False. Se True for passado, será incluso na lista de casas possíveis
+            as casas com potencial de serem possíveis, ou seja, na prática são casas que a peça atual não poderia ir,
+            pois existe uma peça do mesmo time nela, mas que seria possível se nessa casa estivesse uma peça do time
+            adversário.
+
+        :return: Lista de casas em que a peça pode ser jogada.
+        """
         pass
 
     @abc.abstractmethod
