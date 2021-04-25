@@ -50,3 +50,27 @@ class IA(pygame.sprite.Sprite):
         tabuleiro.casas_possiveis = tabuleiro.casa_selecionada.peca.get_casas_possiveis(tabuleiro.vetor_de_Controle)
         tabuleiro.selecionar_casa(casa_destino, casa_destino.posicao_na_matriz)
         tabuleiro.limpar_selecoes()
+
+
+    # IA versus IA
+    # def melhor_movimento(self):
+    #     placar = self.calcular_placar()
+    #     posicao = None
+    #     vetor_de_controle_inicial = self.vetor_de_Controle
+    #     for i in range(8):
+    #         for j in range(8):
+    #             if self.vetor_de_Controle[i][j].peca is not None:
+    #                 peca = self.vetor_de_Controle[i][j].peca
+    #                 if peca.tonalidade == self.vez:
+    #                     #(APAGAR) ideia: usar um vetor de controle falso
+    #                     for casa in peca.get_casas_possiveis(self.vetor_de_Controle):
+    #                         self.selecionar_casa(casa, [i,j])
+    #                         self.mover_peca(casa)
+    #                         # self.vetor_de_Controle = vetor_de_controle_inicial
+    #
+    #                     placar_temp = self.calcular_placar()
+    #                     # para as claras o placar deve ser o maior possível
+    #                     if placar_temp is not None and placar is not None and placar_temp > placar:
+    #                         placar = placar_temp
+    #                         #por enquanto salvando apenas a posicao da peça
+    #                         posicao = peca.posicao
