@@ -213,7 +213,6 @@ class Tabuleiro(pygame.sprite.Sprite):
         if modoJogo == 2:
             IA(self)
 
-
     def trocar_vez(self):
         """
         Troca a vez do jogador.
@@ -250,8 +249,7 @@ class Tabuleiro(pygame.sprite.Sprite):
         time.sleep(0.5)
         txt = 'Vez do jogador ' + jogador  ##### armazena o texto
         pygame.font.init()  ##### inicia font
-        fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
-        fontesys = pygame.font.SysFont(fonte, 50)  ##### usa a fonte padrão
+        fontesys = pygame.font.SysFont("Arial", 50)  ##### usa a fonte padrão
         txttela = fontesys.render(txt, 1, (255, 255, 255))  ##### renderiza o texto na cor desejada
         self.display.blit(txttela, (480, 15))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
@@ -727,15 +725,13 @@ class Tabuleiro(pygame.sprite.Sprite):
         time.sleep(0.5)
         txt = 'Vitória do jogador ' + jogador + '!!!'  ##### armazena o texto
         pygame.font.init()  ##### inicia font
-        fonte = pygame.font.get_default_font()  ##### carrega com a fonte padrão
-        fontesys = pygame.font.SysFont(fonte, 120)  ##### usa a fonte padrão
+        fontesys = pygame.font.SysFont("Arial", 120)  ##### usa a fonte padrão
         txttela = fontesys.render(txt, 1,  (119, 221, 119))  ##### renderiza o texto na cor desejada
         self.display.blit(txttela, (150, 280))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
         txt2 = 'XEQUE-MATE'  ##### armazena o texto
         pygame.font.init()  ##### inicia font
-        fonte2 = pygame.font.get_default_font()  ##### carrega com a fonte padrão
-        fontesys2 = pygame.font.SysFont(fonte2, 50)  ##### usa a fonte padrão
+        fontesys2 = pygame.font.SysFont("Arial", 50)  ##### usa a fonte padrão
         txttela2 = fontesys2.render(txt2, 1, (255, 255, 255)) ##### renderiza o texto na cor desejada
         self.display.blit(txttela2, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
