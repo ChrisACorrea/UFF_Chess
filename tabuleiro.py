@@ -12,7 +12,7 @@ import random
 
 class Tabuleiro(pygame.sprite.Sprite):
 
-    def __init__(self, display: pygame.Surface, *groups: AbstractGroup, jogador1, jogador2):
+    def __init__(self, display: pygame.Surface, *groups: AbstractGroup, jogador1, jogador2, modo_de_jogo):
         super().__init__(*groups)
         self.display: pygame.Surface
         self.objectGroup: Group
@@ -24,19 +24,20 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.altura_tela = display.get_height()
         self.objectGroup = pygame.sprite.Group()
 
-        #self.jogadorVsIA = False
-        self.jogadorVsIA = True
-
         # variável que guarda a referência dos dois reis para consultas rápidas
         # branco no indice [0] e preto no indice [1]
         self.reis: tuple[Rei, Rei] = [None, None]
 
         self.iniciar_tabuleiro()
 
+        global modoJogo
+        modoJogo = modo_de_jogo
+
         global jogadorOne
         jogadorOne = jogador1
         global jogadorTwo
         jogadorTwo = jogador2
+        
 
     def iniciar_tabuleiro(self):
         """
@@ -204,8 +205,9 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         self.promocao()
         self.trocar_vez()
+
         # IA:
-        if self.jogadorVsIA:
+        if modoJogo == 2:
             self.melhor_movimento()
 
 
@@ -698,6 +700,8 @@ class Tabuleiro(pygame.sprite.Sprite):
         if len(todas_casas_possiveis) == 0 and self.get_rei_da_vez().is_xeque():
 
             print("XEQUE-MATE!")
+            
+
             return True
         return False
 
