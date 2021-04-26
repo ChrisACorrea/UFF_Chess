@@ -44,7 +44,7 @@ class IA(pygame.sprite.Sprite):
             tam_destino = len(casa_origem.peca.get_casas_possiveis(tabuleiro.vetor_de_Controle))
             index_destino = random.randrange(0, tam_destino, 1)
             casa_destino = casa_origem.peca.get_casas_possiveis(tabuleiro.vetor_de_Controle)[index_destino]
-            
+
         casa_destino.marcar_como_possivel()    
         tabuleiro.casa_selecionada = casa_origem    
         tabuleiro.casas_possiveis = tabuleiro.casa_selecionada.peca.get_casas_possiveis(tabuleiro.vetor_de_Controle)

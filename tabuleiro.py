@@ -226,7 +226,9 @@ class Tabuleiro(pygame.sprite.Sprite):
             if status == True:
                 self.mostrar_msg_xeque_mate(jogadorOne)
             else:
-                self.mostrar_vez(jogadorTwo)
+                if modoJogo == 1 and self.vez == 'escuro':
+                    self.mostrar_vez(jogadorTwo)
+                self.limpar_selecoes()
         elif self.vez == 'escuro':
             self.vez = 'claro'
             self.verifica_xeque()
