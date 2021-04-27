@@ -210,8 +210,8 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.trocar_vez()
 
         # IA:
-        if modoJogo == 2:
-            IA(self)
+        if modoJogo >= 2:
+            IA(self, modoJogo)
 
     def trocar_vez(self):
         """

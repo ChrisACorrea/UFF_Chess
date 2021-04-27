@@ -32,7 +32,7 @@ menu = pygame_menu.Menu(720, 1280, 'Bem vindo ao UFF_Chess',
 
 jogador1 = menu.add.text_input('Nome do jogador 1: ', default='1')
 jogador2 = menu.add.text_input('Nome do jogador 2: ', default='2')
-menu.add.selector('Modo de jogo :', [('Jogador vs Jogador', 1), ('Jogador vs IA', 2)], onchange=modo_de_jogo)
+menu.add.selector('Modo de jogo :', [('Jogador vs Jogador', 1), ('Jogador vs IA', 2), ('IA vs IA', 3)], onchange=modo_de_jogo)
 menu.add.button('Jogar', menu.disable)
 menu.add.button('Sair', pygame_menu.events.EXIT)
 menu.mainloop(display)
