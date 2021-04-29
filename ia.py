@@ -52,8 +52,8 @@ class IA(pygame.sprite.Sprite):
         casa_destino.marcar_como_possivel()    
         tabuleiro.casa_selecionada = casa_origem    
         tabuleiro.casas_possiveis = tabuleiro.casa_selecionada.peca.get_casas_possiveis(tabuleiro.vetor_de_Controle)
-        tabuleiro.selecionar_casa(casa_origem, casa_destino.posicao_na_matriz)
-        tabuleiro.casas_possiveis = tabuleiro.casa_selecionada.peca.get_casas_possiveis(tabuleiro.vetor_de_Controle)
+        # tabuleiro.selecionar_casa(casa_origem, casa_destino.posicao_na_matriz)
+        # tabuleiro.casas_possiveis = tabuleiro.casa_selecionada.peca.get_casas_possiveis(tabuleiro.vetor_de_Controle)
         tabuleiro.selecionar_casa(casa_destino, casa_destino.posicao_na_matriz)
         tabuleiro.limpar_selecoes()
 
