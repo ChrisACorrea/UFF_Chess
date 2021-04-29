@@ -15,11 +15,10 @@ class Rainha(PecaBase):
 
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.RAINHA_PRETO
-            self.valor = -9
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.RAINHA_BRANCO
-            self.valor = 9
 
+        self.valor = 9
         self.carregar_imagem(self.rect.copy())
 
     def carregar_imagem(self, rect_base: pygame.Rect) -> None:
