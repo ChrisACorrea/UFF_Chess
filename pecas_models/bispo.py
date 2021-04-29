@@ -15,11 +15,10 @@ class Bispo(PecaBase):
 
         if self.tonalidade == 'escuro':
             self.caminho_imagem = ImagesPath.BISPO_PRETO
-            self.valor = -3
         elif self.tonalidade == 'claro':
             self.caminho_imagem = ImagesPath.BISPO_BRANCO
-            self.valor = 3
 
+        self.valor = 3
         self.carregar_imagem(self.rect.copy())
 
     def carregar_imagem(self, rect_base: pygame.Rect) -> None:

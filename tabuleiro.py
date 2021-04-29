@@ -740,12 +740,3 @@ class Tabuleiro(pygame.sprite.Sprite):
         time.sleep(7)
         
         self.fim_jogo()
-
-    def calcular_placar(self):
-        placar = 0
-        for i in range(8):
-            for j in range(8):
-                if self.vetor_de_Controle[i][j].peca is not None:
-                    peca = self.vetor_de_Controle[i][j].peca
-                    placar +=  peca.valor
-        print("PLACAR:", placar)
