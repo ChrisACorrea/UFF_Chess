@@ -37,7 +37,7 @@ class Start():
                         gameLoop = False
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         posicao_mouse = pygame.mouse.get_pos()
-                        if tabuleiro.clicou_dentro_do_tabuleiro(posicao_mouse) and tabuleiro.modoJogo == 1:
+                        if tabuleiro.clicou_dentro_do_tabuleiro(posicao_mouse) and tabuleiro.modoJogo < 3:
                             tabuleiro.selecionar_casa(posicao_mouse)
                         else:
                             tabuleiro.limpar_selecoes()
