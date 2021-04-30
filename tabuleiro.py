@@ -715,11 +715,11 @@ class Tabuleiro(pygame.sprite.Sprite):
             return True
         return False
 
-    def houve_empate(self):
+    def houve_empate(self) -> bool:
         total_peças: int = 0
 
-        for i in range (0, 7):
-            for j in range(0, 7):
+        for i in range(8):
+            for j in range(8):
                 if self.vetor_de_Controle[i][j].peca is not None:
                     total_peças += 1
 
@@ -770,13 +770,20 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.desenhar_tabuleiro()
         pygame.display.update()
         time.sleep(0.5)
-
-        txt2 = 'EMPATE'  ##### armazena o texto
+        txt = 'O jogo empatou !!!'  ##### armazena o texto
+        pygame.font.init()  ##### inicia font
+        fontesys = pygame.font.SysFont("Arial", 120)  ##### usa a fonte padrão
+        txttela = fontesys.render(txt, 1, (119, 221, 119))  ##### renderiza o texto na cor desejada
+        self.display.blit(txttela, (150, 280))  ##### coloca na posição 50,900 (tela FHD)
+        pygame.display.update()
+        txt2 = 'Empate'  ##### armazena o texto
         pygame.font.init()  ##### inicia font
         fontesys2 = pygame.font.SysFont("Arial", 50)  ##### usa a fonte padrão
         txttela2 = fontesys2.render(txt2, 1, (255, 255, 255))  ##### renderiza o texto na cor desejada
         self.display.blit(txttela2, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
         pygame.display.update()
         time.sleep(7)
+
+        self.fim_jogo()
 
         self.fim_jogo()
