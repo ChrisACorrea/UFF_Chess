@@ -217,17 +217,23 @@ class Tabuleiro(pygame.sprite.Sprite):
         if self.vez == 'claro':
             self.vez = 'escuro'
             self.verifica_xeque()
-            status = self.houve_xeque_mate()
-            if status == True:
+            foi_mate = self.houve_xeque_mate()
+            foi_empate = self.houve_empate()
+            if foi_mate == True:
                 self.mostrar_msg_xeque_mate(jogadorOne)
+            elif foi_empate:
+                self.mostrar_msg_empate()
             else:
                 self.mostrar_vez(jogadorTwo)
         elif self.vez == 'escuro':
             self.vez = 'claro'
             self.verifica_xeque()
-            status = self.houve_xeque_mate()
-            if status == True:
+            foi_mate = self.houve_xeque_mate()
+            foi_empate = self.houve_empate()
+            if foi_mate == True:
                 self.mostrar_msg_xeque_mate(jogadorTwo)
+            elif foi_empate:
+                self.mostrar_msg_empate()
             else:
                 self.mostrar_vez(jogadorOne)
 
@@ -709,6 +715,16 @@ class Tabuleiro(pygame.sprite.Sprite):
             return True
         return False
 
+    def houve_empate(self):
+        total_peças: int = 0
+
+        for i in range (0, 7):
+            for j in range(0, 7):
+                if self.vetor_de_Controle[i][j].peca is not None:
+                    total_peças += 1
+
+        return total_peças <= 2
+
     def fim_jogo(self):
         #display = pygame.display.set_mode([200, 200])
 
@@ -742,4 +758,25 @@ class Tabuleiro(pygame.sprite.Sprite):
         pygame.display.update()
         time.sleep(7)
         
+        self.fim_jogo()
+
+    def mostrar_msg_empate(self):
+        """
+        Quando chamado. Imprime na tela a mensagem 'Empate'
+        :return:
+        """
+
+        self.limpar_selecoes()
+        self.desenhar_tabuleiro()
+        pygame.display.update()
+        time.sleep(0.5)
+
+        txt2 = 'EMPATE'  ##### armazena o texto
+        pygame.font.init()  ##### inicia font
+        fontesys2 = pygame.font.SysFont("Arial", 50)  ##### usa a fonte padrão
+        txttela2 = fontesys2.render(txt2, 1, (255, 255, 255))  ##### renderiza o texto na cor desejada
+        self.display.blit(txttela2, (470, 15))  ##### coloca na posição 50,900 (tela FHD)
+        pygame.display.update()
+        time.sleep(7)
+
         self.fim_jogo()
