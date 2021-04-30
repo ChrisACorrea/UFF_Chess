@@ -33,8 +33,7 @@ class Tabuleiro(pygame.sprite.Sprite):
 
         self.iniciar_tabuleiro()
 
-        global modoJogo
-        modoJogo = modo_de_jogo
+        self.modoJogo = modo_de_jogo
 
         global jogadorOne
         jogadorOne = jogador1
@@ -209,10 +208,6 @@ class Tabuleiro(pygame.sprite.Sprite):
         self.promocao()
         self.trocar_vez()
 
-        # IA:
-        if modoJogo >= 2:
-            IA(self, modoJogo)
-
     def trocar_vez(self):
         """
         Troca a vez do jogador.
@@ -226,9 +221,7 @@ class Tabuleiro(pygame.sprite.Sprite):
             if status == True:
                 self.mostrar_msg_xeque_mate(jogadorOne)
             else:
-                if modoJogo == 1 and self.vez == 'escuro':
-                    self.mostrar_vez(jogadorTwo)
-                self.limpar_selecoes()
+                self.mostrar_vez(jogadorTwo)
         elif self.vez == 'escuro':
             self.vez = 'claro'
             self.verifica_xeque()
@@ -245,6 +238,16 @@ class Tabuleiro(pygame.sprite.Sprite):
         :param jogador:
         :return:
         """
+
+        if self.modoJogo == 2:
+            if self.vez == "escuro":
+                jogador = "IA"
+        if self.modoJogo == 3:
+            if self.vez == "claro":
+                jogador = "IA 01"
+            if self.vez == "escuro":
+                jogador = "IA 02"
+
         self.limpar_selecoes()
         self.desenhar_tabuleiro()
         pygame.display.update()

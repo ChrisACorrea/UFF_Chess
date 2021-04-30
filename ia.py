@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pygame
 import random
+import time
 
 from casa import Casa
 
@@ -67,10 +68,12 @@ class IA(pygame.sprite.Sprite):
         #tabuleiro.limpar_selecoes()
 
     def jogador_vs_ia(self, tabuleiro):
+        time.sleep(2)
         self.movimento_peca(tabuleiro, "escuro")
 
     def ia_vs_ia(self, tabuleiro):
         self.movimento_peca(tabuleiro, "claro")
+        time.sleep(2)
         self.movimento_peca(tabuleiro, "escuro")
 
     def iniciar_ia(self, tabuleiro, modo_de_jogo):
